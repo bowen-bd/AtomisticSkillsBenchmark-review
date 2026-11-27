@@ -29,5 +29,5 @@ The verifier also checks identity and units:
 ## Validation Notes
 
 - Original validation: oracle 1.0 and no-op 0.0 against the numeric-only checks.
-- 2026-11-27: the identity and unit checks were added. The live reference solution was re-run against NIST and passed the extended verifier (`formula=NH3`, `name=Ammonia`, `nist_id=C7664417`, units `kJ/mol` and `J/mol*K`).
+- The live reference solution passed after identity and unit checks were added. The prompt's example uses placeholders so it does not disclose the target record.
 - Fixture matrix after the change: a correct result passes; NIST-synonym names, a bare numeric NIST ID and common equivalent unit spellings pass; wrong formula/name/ID/unit/value and missing fields fail; an empty or missing result fails.

@@ -14,6 +14,7 @@ import collections
 import datetime
 import glob
 import json
+import math
 import os
 import sys
 
@@ -133,6 +134,8 @@ def collect(jobs_dirs, crashed=None):
                 with open(reward_file, encoding="utf-8") as f:
                     reward = float(f.read().strip())
             except (OSError, ValueError):
+                continue
+            if not math.isfinite(reward):
                 continue
             has_skills = bool(agent.get("skills")) or ("AtomisticSkills" in json.dumps(conf))
             try:

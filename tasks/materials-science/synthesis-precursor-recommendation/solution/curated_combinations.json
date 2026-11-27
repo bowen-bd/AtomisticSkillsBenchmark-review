@@ -1,5 +1,5 @@
 {
-  "_comment": "Bundled curated ground truth for the reference solution. The canonical sets mirror tests/expected.json key-for-key; run `python solution/check_consistency.py` after editing either file. Representative formulas are concrete formulas that normalize to the same canonical sets; a few preserve the text-mined source spelling (for example NaCO3 and V(CH3COCHCOCH3)5), so the formulas are not all conventional names.",
+  "_comment": "Bundled reference corpus for the oracle. The canonical sets mirror tests/expected.json key-for-key; run solution/check_consistency.py after editing either file. Some representative formulas retain source spellings.",
   "target_formula": "Na3V2(PO4)3",
   "required_routes_count": 5,
   "routes": [
@@ -14,10 +14,6 @@
     {
       "canonical": ["H2Na1O4P1", "O5V2"],
       "representative_formulas": ["NaH2PO4", "V2O5"]
-    },
-    {
-      "canonical": ["C1Na1O3", "H6N1O4P1", "O5V2"],
-      "representative_formulas": ["NaCO3", "NH4H2PO4", "V2O5"]
     },
     {
       "canonical": ["O3V2", "H2Na1O4P1"],

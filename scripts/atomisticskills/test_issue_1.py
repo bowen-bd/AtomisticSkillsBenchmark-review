@@ -1,6 +1,6 @@
 """Run with `python -B -m unittest scripts.atomisticskills.test_issue_1`.
 
-Uses the standard library except for the synthesis check, which needs pymatgen.
+Uses the standard library except for the scientific checks that need pymatgen.
 """
 from copy import deepcopy
 import importlib.util
@@ -20,9 +20,9 @@ ALLOWLIST = {
     "ghs-hazard-summary": ["pubchem.ncbi.nlm.nih.gov"],
     "nist-janaf-query": ["webbook.nist.gov"],
     "nmr-reaction-kinetics": ["cactus.nci.nih.gov", "www.nmrdb.org"],
-    **dict.fromkeys(("convex-hull-stability", "electrochemical-window",
-                     "mgo-vacancy-energy", "synthesis-precursor-recommendation",
-                     "xrd-mixture-phase-fit"), ["api.materialsproject.org"]),
+    **dict.fromkeys(("convex-hull-stability", "mgo-vacancy-energy",
+                     "synthesis-precursor-recommendation", "xrd-mixture-phase-fit"),
+                    ["api.materialsproject.org"]),
 }
 
 
@@ -103,9 +103,37 @@ class IssueOneTests(unittest.TestCase):
             ({"window_width_V": reference["window_width_V"] + 0.01}, "Window width"),
             ({"reduction_voltage_V": reference["reduction_voltage_V"] + 0.02}, "reduction_voltage_V"),
             ({"stable": not reference["stable"]}, "stability flag"),
+            ({"target_energy_per_atom_eV": reference["target_energy_per_atom_eV"] + 0.002}, "target_energy"),
+            ({"competing_phase_count": float(reference["competing_phase_count"])}, "integer count"),
+            ({"energy_above_hull_meV_atom": -0.001}, "nonnegative"),
         ):
             with self.subTest(message=message), self.assertRaisesRegex(AssertionError, message):
                 verifier.check_result(reference | changes, targets)
+
+    def test_equilibrium_window_tracks_the_supplied_phase(self):
+        if importlib.util.find_spec("pymatgen") is None:
+            self.skipTest("requires pymatgen and SciPy")
+        window = load_module(MATERIALS / "electrochemical-window/solution/window.py")
+
+        def phase(name, formula, energy, count):
+            return {"id": name, "formula": formula, "energy_eV": energy,
+                    "n_sites": count, "converged": True}
+
+        competitors = [phase("li", "Li", 0, 1), phase("p", "P", 0, 1),
+                       phase("s", "S", 0, 1), phase("lips", "LiPS", -7, 3),
+                       phase("li3ps", "Li3PS", -10, 5)]
+        target = phase("target_cif", "Li2PS", -9, 4)
+        reference = window.equilibrium_window(competitors + [target])
+        self.assertTrue(reference["stable"])
+        self.assertAlmostEqual(reference["reduction_voltage_V"], 1.0)
+        self.assertAlmostEqual(reference["oxidation_voltage_V"], 2.0)
+        polymorph = phase("other_polymorph", "Li2PS", -9.004, 4)
+        actual = window.equilibrium_window(competitors + [target, polymorph])
+        self.assertFalse(actual["stable"])
+        self.assertAlmostEqual(actual["energy_above_hull_meV_atom"], 1.0)
+        self.assertIsNone(actual["reduction_voltage_V"])
+        self.assertIsNone(actual["oxidation_voltage_V"])
+        self.assertIsNone(actual["independent_bounds_V"])
 
     def test_nist_sample_does_not_disclose_reference(self):
         task = MATERIALS / "nist-janaf-query"
@@ -157,7 +185,7 @@ class IssueOneTests(unittest.TestCase):
                         result.write_text(json.dumps(candidate))
                         verifier.test_result_identity_and_thermochemistry()
 
-    def test_synthesis_checks_all_reported_routes(self):
+    def test_synthesis_counts_only_distinct_supported_routes(self):
         if importlib.util.find_spec("pymatgen") is None:
             self.skipTest("requires pymatgen")
         task = MATERIALS / "synthesis-precursor-recommendation"
@@ -167,12 +195,12 @@ class IssueOneTests(unittest.TestCase):
         routes = [r["representative_formulas"] for r in curated["routes"]]
         minimum = expected["required_routes_count"]
         reference = {"target_formula": curated["target_formula"]}
-        for combinations in (routes[:minimum], routes):
+        extras = [routes[0][::-1], ["H2O", "CO2"], None]
+        for combinations in (routes[:minimum], routes, extras + routes[:minimum]):
             verifier.check_result(reference | {"precursor_combinations": combinations}, expected)
-        for extra, error in ((routes[0][::-1], "duplicate"), (["H2O", "CO2"], "not one of")):
-            with self.subTest(error=error), self.assertRaisesRegex(AssertionError, error):
-                verifier.check_result(reference | {"precursor_combinations": routes[:minimum] + [extra]},
-                                      expected)
+        with self.assertRaisesRegex(AssertionError, f"found {minimum - 1}"):
+            verifier.check_result(reference | {"precursor_combinations": extras + routes[:minimum - 1]},
+                                  expected)
 
     def test_crashes_are_reported_even_without_reward(self):
         report = load_module(ROOT / "scripts/atomisticskills/pass_rates.py")

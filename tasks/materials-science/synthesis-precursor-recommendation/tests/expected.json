@@ -1,5 +1,5 @@
 {
-  "_comment": "Curated canonical precursor sets for Na3V2(PO4)3. This file is the verifier's ground truth; solution/curated_combinations.json mirrors these 17 keys for the oracle and can be checked with `python solution/check_consistency.py`. Do not add a route here without adding it to the solution bundle and re-running that check.",
+  "_comment": "Fixed Materials Project precursor corpus. Mirror these keys in solution/curated_combinations.json and run solution/check_consistency.py after changes. The invalid NaCO3 text-mined entry was removed after checking its source.",
   "target_formula": "Na3V2(PO4)3",
   "required_routes_count": 5,
   "valid_canonical_combinations": [
@@ -15,11 +15,6 @@
     ],
     [
       "H2Na1O4P1",
-      "O5V2"
-    ],
-    [
-      "C1Na1O3",
-      "H6N1O4P1",
       "O5V2"
     ],
     [

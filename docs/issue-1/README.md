@@ -1,0 +1,17 @@
+# Issue 1: historical results and revised tasks
+
+These are audits of saved artifacts, not new model measurements. The original site is preserved at [its published snapshot](https://github.com/learningmatter-mit/AtomisticSkillsBenchmark/tree/d9610cfcecfe8dc44d97c6a7546deee3caeb7d21). We matched 54 displayed records, 18 for each task below, to saved trials using model, skill mode, reward and displayed telemetry. This was a post hoc match, not a preregistered trial manifest. Neither a regrade nor the absence of suspicious activity in a retained trace establishes how a model independently arrived at its answer.
+
+| Task | What the saved evidence supports | Disposition |
+| --- | --- | --- |
+| [NIST JANAF](nist.json) | All 18 saved answers match the reference and have corresponding WebBook content in the trace: 13 live observations and five cached responses. All 18 prompts disclosed the two graded values. | Preserve all 18 historical scores, explicitly marked **answer disclosed in original prompt**. Do not count them as evidence of independent retrieval or as scores on the corrected prompt. |
+| [Synthesis precursors](synthesis.json) | The first strict whitelist would credit 9/18. Under the original published-route requirement, the audit supports 12/18 without snippet-only evidence, 13/18 including it, 8/18 if abstracts are also excluded, and 1/18 with full-text-only evidence. Five fall short even under the most permissive evidence tier. | Retain the original recorded scores in the archive. Report the adjudication and its evidence tiers separately. Do not infer fabrication or apply the new, narrower corpus scope retroactively. |
+| [Electrochemical window](electrochemical-window.json) | On the revised equilibrium reference, reading only the four original fields and applying the original 20/20/30 mV tolerances reproduces 15 passes and three failures. A separate 10/10/20 mV sensitivity check yields nine passes and nine failures. | Preserve the numerical regrade as historical only. The saved fields do not establish relaxation, target identity, or performance on the revised task. |
+
+The new electrochemical reference evaluates the supplied target, not the lowest-energy entry with the same formula. It uses a frozen set of 95 competing structures, an immutable TensorNet checkpoint, converged atomic and cell relaxations, and two independent calculations of the equilibrium voltage bounds. See the [reference protocol](../../tasks/materials-science/electrochemical-window/README.md). The revised synthesis task tests against an explicitly scoped Materials Project corpus, counts five distinct supported matches, and ignores extra unmatched entries; one invalid, misattributed text-mined key was removed. The revised NIST prompt uses placeholders rather than the graded values.
+
+## Reporting
+
+- The current leaderboard accepts only finished, scored, exception-free trials for the shipped task revisions; these filters are applied before the per-mode sample limit. Its optional archive tabulates excluded records separately and does not mix them into pass rates.
+- Historic published scores and the three audits above remain available. They do not populate the revised leaderboard. A missing current trial is not a failed trial. No retired model was rerun for these audits.
+- The public summaries contain counts and outcomes, not raw model traces, answer files, or credentials. Detailed route evidence and original trials remain with the benchmark operators.

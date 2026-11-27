@@ -101,7 +101,7 @@
   },
   "electrochemical-window": {
     "path": "tasks/materials-science/electrochemical-window",
-    "release": "950717f3565e32f6bd21341db0e628405d31d920632b194dcc7171e098461b5d",
+    "release": "66b69cbc5461d277388bd2b6b25bee44e467780c020f384017b91118bed84166",
     "verified": []
   },
   "li-qha-simulation": {
@@ -126,7 +126,7 @@
   },
   "nist-janaf-query": {
     "path": "tasks/materials-science/nist-janaf-query",
-    "release": "eac551c857a55e7b9d0de2e4ac09077d23182076ebd84ecd1be8b2f53519a72e",
+    "release": "7879bf62d778076dffaa001677665b88a34b861b7156c84b8154cc2687952141",
     "verified": []
   },
   "polymorph-free-energy": {
@@ -146,7 +146,7 @@
   },
   "synthesis-precursor-recommendation": {
     "path": "tasks/materials-science/synthesis-precursor-recommendation",
-    "release": "f73b3b505f2a473cd9eb7ca1649ab49a064b69e87dac83c9785ab36c4f56d3cb",
+    "release": "55b5fee508627fb3cec84150c62fda9b4f2932fccad7cdc92a7e531b9923d916",
     "verified": []
   },
   "xrd-mixture-phase-fit": {

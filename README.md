@@ -71,7 +71,7 @@ describing provenance, the reference values and how the tolerances were derived.
 | [`co-adsorption-cu111`](tasks/materials-science/co-adsorption-cu111/) | materials-science | GPU |
 | [`convex-hull-stability`](tasks/materials-science/convex-hull-stability/) | stability | GPU, `MP_API_KEY` |
 | [`crconi-order-disorder`](tasks/materials-science/crconi-order-disorder/) | alloy thermodynamics | GPU |
-| [`electrochemical-window`](tasks/materials-science/electrochemical-window/) | electrochemistry | GPU, `MP_API_KEY` |
+| [`electrochemical-window`](tasks/materials-science/electrochemical-window/) | electrochemistry | GPU |
 | [`li-qha-simulation`](tasks/materials-science/li-qha-simulation/) | materials-science | GPU |
 | [`lifepo4-intercalation-voltage`](tasks/materials-science/lifepo4-intercalation-voltage/) | materials-science | GPU |
 | [`mgo-vacancy-energy`](tasks/materials-science/mgo-vacancy-energy/) | materials-science | GPU, `MP_API_KEY` |
@@ -171,10 +171,10 @@ to `~/.codex/auth.json` for the `codex` agent when `OPENAI_API_KEY` is unset.
 python3 scripts/atomisticskills/pass_rates.py jobs/ -o pass-rates.md
 ```
 
-aggregates finished trials into per-model, per-task pass rates in each skill
-mode, with wall time, tokens and cost. Runs from before the network and verifier
-hardening are not equivalent to this task revision and should be reported
-separately.
+aggregates finished, scored trials into per-model, per-task pass rates in each
+skill mode, with wall time, tokens and cost. By default it excludes older task
+revisions. The [Issue #1 historical review](docs/issue-1/README.md) preserves
+and audits old results without treating them as measurements of the revised tasks.
 
 ## Website
 
@@ -183,11 +183,15 @@ from the `gh-pages` branch:
 
 ```bash
 python3 scripts/atomisticskills/build_site.py jobs/ -o site/
+# Optionally render older and unscored trial metadata on a separate page:
+python3 scripts/atomisticskills/build_site.py jobs/ --archive -o site-with-archive/
 ```
 
-It shows per-model and per-task pass rates in both skill modes, with wall time,
-token counts and cost. It never reads the agents' answer files, verifier logs or
-reasoning traces, so none of them are published.
+Build into a fresh output directory. The current site includes only scored,
+exception-free trials of the shipped revisions, filtered before selecting the
+per-mode trial limit. `--archive` puts excluded records on a separate page and
+never adds them to these pass rates. The site builder does not read agents'
+answer files, verifier logs or reasoning traces.
 
 ## Repository layout
 

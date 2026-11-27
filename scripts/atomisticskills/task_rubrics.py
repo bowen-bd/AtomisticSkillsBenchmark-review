@@ -407,19 +407,21 @@ TASK_RUBRICS = {
         "domain": "Materials Science",
         "observable": "Reduction Potential (V), Oxidation Potential (V), and Window Width (V vs Li/Li⁺)",
         "target_artifact": "/root/results/result.json",
-        "expected_keys": ["reduction_voltage_V", "oxidation_voltage_V", "window_width_V", "energy_above_hull_meV_atom", "stable"],
+        "expected_keys": ["reduction_voltage_V", "oxidation_voltage_V", "window_width_V", "energy_above_hull_meV_atom", "target_energy_per_atom_eV", "competing_phase_count", "stable"],
         "boolean_rubric": {},
         "numerical_tolerances": {
             "reduction_voltage_V": "± 0.010 V relative to the TensorNet reference",
             "oxidation_voltage_V": "± 0.010 V relative to the TensorNet reference",
             "window_width_V": "± 0.020 V relative to the TensorNet reference",
-            "energy_above_hull_meV_atom": "± 0.001 meV/atom relative to the TensorNet reference",
+            "energy_above_hull_meV_atom": "± 0.01 meV/atom relative to the TensorNet reference",
+            "target_energy_per_atom_eV": "± 0.0002 eV/atom relative to the TensorNet reference",
         },
         "categorical_rules": [
             "Window width agrees with the difference between the reported bounds within 0.002 V",
             "Stability flag is consistent with the reported energy above the hull",
+            "Phase count matches the frozen set excluding the target",
         ],
-        "verifier_method": "Compares the submission to a TensorNet phase-diagram reference and checks internal consistency.",
+        "verifier_method": "Compares the result for the supplied CIF to the pinned TensorNet equilibrium reference.",
     },
     "li-qha-simulation": {
         "title": "Quasi-Harmonic Approximation (QHA) Thermal Properties",
@@ -576,7 +578,7 @@ TASK_RUBRICS = {
         },
         "categorical_rules": [
             "The target formula matches the task input",
-            "Every submitted combination matches a curated route after formula normalization",
+            "Only distinct normalized matches to the fixed Materials Project corpus count; extras are not penalized",
         ],
         "verifier_method": "Checks canonical precursor sets against the curated reference corpus.",
     },
