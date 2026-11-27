@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="description" content="AtomisticSkills Benchmark v0.2 preview: current-revision pilot results and evaluation coverage.">
+  <meta name="description" content="AtomisticSkills Benchmark v0.2 preview: task changes, historical audit outcomes, and current-revision pilot results.">
   <title>AtomisticSkills Benchmark v0.2 Preview</title>
   <style>
     :root { color-scheme: light dark; --paper:#f6f8fb; --ink:#15222d; --muted:#4b5e6f; --card:#fff; --border:#cbd6df; --accent:#135b55; --tint:#e8f5f2; }
@@ -15,6 +15,10 @@
     header { margin-bottom:2rem; }
     h1 { margin:.4rem 0; line-height:1.15; font-size:clamp(2.1rem,6vw,3.55rem); }
     h2 { margin:0 0 .6rem; line-height:1.2; }
+    h3 { margin:0 0 .35rem; font-size:1.04rem; }
+    nav { display:flex; flex-wrap:wrap; gap:.35rem 1.1rem; margin-top:1rem; }
+    .change { margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border); }
+    section[id] { scroll-margin-top:1rem; }
     p { margin:.5rem 0; }
     a { color:var(--accent); text-underline-offset:.16em; }
     .badge { display:inline-block; padding:.18rem .66rem; border-radius:100px; background:var(--tint); color:var(--accent); font-weight:700; }
@@ -33,10 +37,50 @@
 <body>
   <main>
     <header>
-      <span class="badge">v0.2 Preview</span>
+      <a class="badge" href="#changes">v0.2 Preview</a>
       <h1>AtomisticSkills Benchmark</h1>
-      <p class="muted">Current-revision results on the review fork. Cross-model rankings are not available for this version yet.</p>
+      <p><strong>All 31 tasks are retained.</strong> Three tasks have new prompts and grading criteria. The clearest change in the historical audit was synthesis: 18 recorded passes, but only 12 had enough source support without relying on search snippets.</p>
+      <nav aria-label="On this page"><a href="#changes">What changed</a><a href="#audit">Which results changed</a><a href="#pilot">New model results</a></nav>
     </header>
+    <section id="changes" aria-labelledby="changes-title">
+      <h2 id="changes-title">What changed in v0.2</h2>
+      <dl>
+        <div><dt>Tasks retained</dt><dd>31 of 31</dd></div>
+        <div><dt>Tasks added</dt><dd>0</dd></div>
+        <div><dt>Tasks removed</dt><dd>0</dd></div>
+      </dl>
+      <div class="change">
+        <h3>NIST JANAF query</h3>
+        <p>The example no longer reveals the two graded values. The verifier now checks which compound was returned and whether the units are correct, as well as the numbers.</p>
+      </div>
+      <div class="change">
+        <h3>Synthesis precursor recommendation</h3>
+        <p>At least five distinct routes must match the specified Materials Project corpus. Chemical plausibility alone no longer counts; unmatched extras do not invalidate five matches. One misattributed corpus entry was removed, not the task.</p>
+      </div>
+      <div class="change">
+        <h3>Electrochemical stability window</h3>
+        <p>The new reference uses the supplied target and a fixed set of 95 competing phases, instead of substituting the lowest-energy structure with the same formula. The verifier now also checks hull distance, target energy and phase count.</p>
+      </div>
+      <div class="change">
+        <h3>Across the suite</h3>
+        <p>The 31 tasks now deny outbound network access by default, with specific scientific data hosts allowed where needed. Verifiers run offline. Trials with recorded exceptions or missing verifier rewards are excluded from current scores rather than counted as model failures.</p>
+      </div>
+    </section>
+    <section id="audit" aria-labelledby="audit-title">
+      <h2 id="audit-title">Which historical results changed?</h2>
+      <p class="muted">These are checks of 54 saved results, not new model runs. The recorded scores are preserved; the audit does not populate the v0.2 ranking.</p>
+      <div class="table">
+        <table aria-label="Historical review by task">
+          <thead><tr><th scope="col">Task</th><th scope="col">Originally recorded</th><th scope="col">What the review found</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">NIST JANAF</th><td>18 passed</td><td><strong>18 retained, with a disclosure caveat.</strong> All have matching WebBook evidence, but the original prompt showed the answers. The records cannot establish independent retrieval.</td></tr>
+            <tr><th scope="row">Synthesis precursors</th><td>18 passed</td><td><strong>12 supported without search snippets; 1 more with snippets; 5 lacked sufficient evidence.</strong> This uses the original publication rule, not the new fixed corpus. Insufficient evidence is not proof of fabrication.</td></tr>
+            <tr><th scope="row">Electrochemical window</th><td>15 passed, 3 failed</td><td><strong>15 passed, 3 failed: no per-result flips</strong> using the new reference and original tolerances. At tighter tolerances, 9 of 18 would pass; that is a sensitivity check, not a revised historical score.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="muted"><a href="https://github.com/bowen-bd/AtomisticSkillsBenchmark-review/blob/826c1bd49418df308a4a45ba539e1390ecd45186/docs/issue-1/README.md">Audit methodology and evidence summaries</a></p>
+    </section>
     <section aria-labelledby="coverage">
       <h2 id="coverage">Evaluation coverage</h2>
       <dl>
@@ -46,9 +90,9 @@
       </dl>
       <p class="muted">The remaining tasks have no scored model trial on the v0.2 revisions. Missing results are not failures.</p>
     </section>
-    <section aria-labelledby="pilot">
-      <h2 id="pilot">Current pilot result</h2>
-      <p class="muted">A single run checks that the evaluation can complete. It is not a suite-wide pass rate or a model comparison.</p>
+    <section id="pilot" aria-labelledby="pilot-title">
+      <h2 id="pilot-title">New model results</h2>
+      <p class="muted">One scored pilot matches the final v0.2 task revisions. There is not enough coverage for a suite-wide pass rate or cross-model ranking.</p>
       <div class="table">
         <table aria-label="Current v0.2 pilot trials">
           <thead><tr><th scope="col">Task</th><th scope="col">Model and runner</th><th scope="col">Mode</th><th scope="col">Outcome</th></tr></thead>
