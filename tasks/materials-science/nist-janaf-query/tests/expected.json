@@ -1,14 +1,34 @@
 {
-  "targets": [
-    {
-      "expected": -45.94,
-      "path": "thermochemistry.ΔfH°gas.value",
-      "tolerance": 0.05
+  "_comment": "Values and the canonical name/ID were verified against the NIST Chemistry WebBook record for NH3 on 2026-11-27. Name aliases are the 'Other names' listed on that NIST record. Do not change one field without re-verifying the others against the live record.",
+  "formula": "NH3",
+  "name": {
+    "canonical": "Ammonia",
+    "aliases": [
+      "Ammonia gas",
+      "Nitro-Sil",
+      "Spirit of Hartshorn",
+      "NH3",
+      "Ammonia, anhydrous",
+      "Anhydrous ammonia",
+      "Aromatic Ammonia, Vaporole"
+    ]
+  },
+  "nist_id": {
+    "canonical": "C7664417",
+    "aliases": [
+      "7664417"
+    ]
+  },
+  "thermochemistry": {
+    "ΔfH°gas": {
+      "value": -45.94,
+      "tolerance": 0.05,
+      "units": "kJ/mol"
     },
-    {
-      "expected": 192.77,
-      "path": "thermochemistry.S°gas,1 bar.value",
-      "tolerance": 0.1
+    "S°gas,1 bar": {
+      "value": 192.77,
+      "tolerance": 0.1,
+      "units": "J/mol*K"
     }
-  ]
+  }
 }

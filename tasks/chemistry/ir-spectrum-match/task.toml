@@ -23,11 +23,14 @@ relevant_experience = "Derived from AtomisticSkills benchmark-development patter
 # tests/Dockerfile installs verifier-only dependencies system-wide.
 timeout_sec = 180.0
 environment_mode = "separate"
+network_mode = "no-network"
 
 [agent]
+network_mode = "no-network"
 timeout_sec = 3600.0
 
 [environment]
+network_mode = "no-network"
 build_timeout_sec = 600.0
 cpus = 1
 memory_mb = 1024

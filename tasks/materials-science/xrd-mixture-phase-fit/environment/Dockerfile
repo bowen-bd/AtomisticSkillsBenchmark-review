@@ -3,7 +3,7 @@ FROM python:3.12-slim
 RUN apt-get update && apt-get install -y --no-install-recommends git \
     gcc \
     g++ \
-    tmux \
+    tmux asciinema \
     qemu-user \
     libc6-amd64-cross \
     && rm -rf /var/lib/apt/lists/*

@@ -151,6 +151,37 @@ homolytic's methyl/methylene hydrogens doesn't apply. The same
 for consistency/future-proofing (e.g. if a future molecule has a symmetric
 heterolytic-eligible pair), but it has no effect on this molecule's grading.
 
+## Verifier Fault Handling and Offline Model Weights
+
+The verifier must not turn a verifier-side failure into a zero for a correct
+submission. `tests/test.sh` therefore distinguishes three outcomes:
+
+- **pytest exits 0**: every check passed, `reward.txt` = 1.
+- **pytest exits 1**: pytest ran and rejected the submission (a failed check,
+  or a missing/malformed `result.json` detected by the `submitted` fixture).
+  This is a real result, `reward.txt` = 0.
+- **any other exit**: collection/import error, no tests collected, an
+  interrupted run, or a verifier-side reference failure. `reward.txt` is left
+  unwritten and the pytest status is propagated, so Harbor reports a verifier
+  infrastructure error rather than scoring 0.
+
+Because a Python exception in the module-scoped `ref` fixture would otherwise
+also exit 1, `ref` catches reference-computation failures (including a missing
+or corrupt checkpoint) and calls `pytest.exit(..., returncode=3)`. Missing or
+malformed submissions are still handled by the cheap `submitted` fixture and
+stay ordinary exit-1 rejections.
+
+Both `environment/Dockerfile` and `tests/Dockerfile` bake the two checkpoints
+into `/root/.cache/mace/` at build time and set `XDG_CACHE_HOME=/root/.cache`,
+which is where `mace-torch` looks before downloading:
+
+- `MACE-OFF23_small.model` (7.3 MB)
+- `MACE-omol-0-extra-large-1024.model` (422 MB)
+
+The build retries each download, checks the size, and checks that the file is a
+torch checkpoint. Agent and verifier therefore use identical weights and need no
+network at runtime.
+
 ## Known Issues Found and Fixed During Validation
 
 - **Torch thread oversubscription under Docker CPU quota**: `torch`/OpenMP
@@ -207,8 +238,9 @@ because the homolytic-only version was too easy.
 
 The agent timeout is 7200 s and the verifier timeout 3600 s. The task itself is
 not expensive — the oracle completes in 398 s — but an agent's run is far
-longer: pulling the `MACE-OMOL-extra-large` checkpoint and relaxing the intact
-molecule plus every homolytic fragment and both polarity variants of every
-heterolytic-eligible fragment, on top of exploration overhead. A timeout is a
-resource artifact rather than a capability signal, so the budget sits far above
-the oracle runtime.
+longer: relaxing the intact molecule plus every homolytic fragment and both
+polarity variants of every heterolytic-eligible fragment, on top of exploration
+overhead. The MACE checkpoints are baked into both images, so this budget does
+not include a runtime checkpoint download. A timeout is a resource artifact
+rather than a capability signal, so the budget sits far above the oracle
+runtime.

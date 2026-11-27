@@ -10,7 +10,7 @@ RUN micromamba install -y -n base -c conda-forge \
     && micromamba clean --all --yes
 ENV PATH=/opt/conda/bin:$PATH
 WORKDIR /root
-RUN apt-get update && apt-get install -y --no-install-recommends git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends tmux asciinema git && rm -rf /var/lib/apt/lists/*
 # AtomisticSkills is a repository-style toolkit rather than a pip package. Pin
 # the exact revision so its src.utils API and mounted skill scripts stay in sync.
 # Install only src/: shipping .agents/skills would leak the skill into no-skill

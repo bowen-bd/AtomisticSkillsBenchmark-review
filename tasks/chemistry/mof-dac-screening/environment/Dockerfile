@@ -3,7 +3,7 @@ FROM python:3.12-slim
 
 # gcc/g++ are needed on CUDA: torch JIT-compiles kernels at first use and aborts
 # with "Failed to find C compiler" on a slim image.
-RUN apt-get update && apt-get install -y --no-install-recommends gcc g++ git \
+RUN apt-get update && apt-get install -y --no-install-recommends tmux asciinema gcc g++ git \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /root

@@ -2,7 +2,7 @@
 FROM python:3.12-slim
 # gcc/g++ are needed only when a GPU is present: on CUDA, torch goes through
 # inductor/triton, which JIT-compiles kernels and aborts without a C compiler.
-RUN apt-get update && apt-get install -y --no-install-recommends git gcc g++ \
+RUN apt-get update && apt-get install -y --no-install-recommends tmux asciinema git gcc g++ \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /root
 # numpy is held below 2.0 on purpose: the skill's Frenkel-Ladd script resolves

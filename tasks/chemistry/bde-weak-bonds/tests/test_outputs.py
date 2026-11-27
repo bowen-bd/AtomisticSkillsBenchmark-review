@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 import os
+import traceback
 
 # Must be set before importing torch: libtorch/OpenMP default to one thread per
 # host-visible core, which oversubscribes and throttles badly under a Docker
@@ -189,9 +190,25 @@ def submitted() -> dict[str, Any]:
 @pytest.fixture(scope="module")
 def ref(submitted: dict[str, Any]) -> dict[str, Any]:
     # Computed once and shared across tests. Depending on `submitted` ensures
-    # this never runs when result.json is missing.
-    smiles = json.loads(Path("/root/data/input.json").read_text())["smiles"]
-    return compute_bde(smiles)
+    # this never runs when result.json is missing, so a missing/bad submission
+    # stays an ordinary pytest exit 1 (reward 0) rather than being confused
+    # with the verifier fault handled below.
+    #
+    # Everything in this fixture is verifier-side: it reads only the fixed
+    # input and reruns the reference workflow. A failure here (e.g. a missing
+    # or corrupt MACE checkpoint) says nothing about the submission, so exit
+    # with a code other than 1. tests/test.sh then leaves reward.txt unwritten
+    # and Harbor reports verifier infrastructure instead of scoring a correct
+    # submission as 0.
+    try:
+        smiles = json.loads(Path("/root/data/input.json").read_text())["smiles"]
+        return compute_bde(smiles)
+    except Exception:
+        pytest.exit(
+            "BDE reference computation failed (verifier infrastructure, not a "
+            "submission failure):\n" + traceback.format_exc(),
+            returncode=3,
+        )
 
 
 def test_weakest_bond_homolytic(submitted: dict[str, Any], ref: dict[str, Any]) -> None:

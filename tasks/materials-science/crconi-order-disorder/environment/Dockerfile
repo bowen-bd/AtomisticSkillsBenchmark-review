@@ -4,7 +4,7 @@ FROM python:3.12-slim
 # gcc/g++ are needed twice here: smol ships Cython sources and is built from an
 # sdist, and on CUDA torch JIT-compiles kernels at first use and aborts with
 # "Failed to find C compiler" on a slim image.
-RUN apt-get update && apt-get install -y --no-install-recommends git gcc g++ \
+RUN apt-get update && apt-get install -y --no-install-recommends tmux asciinema git gcc g++ \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /root

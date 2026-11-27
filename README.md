@@ -15,7 +15,7 @@ A benchmark of 31 computational-science tasks for AI agents working in a termina
 spanning chemistry, drug discovery, machine-learned interatomic potentials
 and materials science. Each task is a self-contained
 [Harbor](https://harborframework.com) task: a natural-language instruction, a
-Docker environment, a reference solution and a hidden verifier.
+Docker environment, a reference solution and a verifier isolated from the agent.
 
 The tasks are derived from the workflows covered by the
 [AtomisticSkills](https://github.com/learningmatter-mit/AtomisticSkills) toolkit,
@@ -90,11 +90,13 @@ the host environment before launching.
 
 ## Running
 
-Requirements: Docker, [Harbor](https://harborframework.com/docs)
-(`uv tool install harbor`), and the API key your model provider expects in the
+Requirements: Docker, [Harbor](https://harborframework.com/docs) with network
+policy enforcement (`uv tool install 'harbor>=0.25.0'`; tested with 0.25.0),
+and the API key your model provider expects in the
 environment (e.g. `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`). Tasks marked
 `MP_API_KEY` above also need a [Materials Project](https://next-gen.materialsproject.org/api)
-key, and tasks marked GPU need one CUDA GPU.
+key for live queries (the bundled synthesis-precursor oracle can also run
+without one), and tasks marked GPU need one CUDA GPU.
 
 ```bash
 git clone https://github.com/learningmatter-mit/AtomisticSkillsBenchmark.git
@@ -107,8 +109,28 @@ harbor run -p tasks/drug-discovery/ecfp-analog-diversity -a oracle
 harbor run -p tasks/chemistry/bde-weak-bonds -a terminus-2 -m anthropic/claude-opus-4-8
 ```
 
-Any Harbor agent works (`-a terminus-2`, `claude-code`, `codex`, ...); `-m` takes
-the provider/model slug that agent expects.
+Use `-m` with the provider/model slug that the selected Harbor agent expects.
+
+### Network and verifier isolation
+
+Tasks default to no outbound network. Only the agent phase of tasks that use
+live scientific data may reach those specific services: Materials Project,
+NIST WebBook, PubChem, or the NCI resolver and NMRdb. Scientific model weights
+used by the bundled workflows are cached at Docker build time. The separate
+verifier has no outbound network.
+
+Agent images include the terminal tools needed by `terminus-2`. If an installed
+agent needs downloads during setup, preinstall it in the image or use Harbor's
+`--allow-environment-host` for the required package hosts. For custom in-container
+inference endpoints or additional scientific data sources, use
+`--allow-agent-host` for the specific hosts (include the inference host when
+providing manual overrides). Do not switch back to public networking for scored
+runs. Docker build-time access and host-side model calls are separate from the
+container policy.
+
+The references and solutions are public source code, not private test data.
+Network restrictions reduce in-trial lookup, but do not address memorization or
+contamination; use held-out inputs and private references for that purpose.
 
 ### With-skill mode
 
@@ -150,7 +172,9 @@ python3 scripts/atomisticskills/pass_rates.py jobs/ -o pass-rates.md
 ```
 
 aggregates finished trials into per-model, per-task pass rates in each skill
-mode, with wall time, tokens and cost.
+mode, with wall time, tokens and cost. Runs from before the network and verifier
+hardening are not equivalent to this task revision and should be reported
+separately.
 
 ## Website
 

@@ -1,227 +1,157 @@
 {
   "bde-weak-bonds": {
     "path": "tasks/chemistry/bde-weak-bonds",
-    "release": "68110f610d24bf8d0edc5f13ca83e1c01bdb3d6e5dde2ed55152ebffe8b681fc",
-    "verified": [
-      "71446ef28f797031f6d02c9e34c21347828158271a1bb22743e47b092ba5b10e"
-    ]
+    "release": "e20223b88c8da6fd2a19d65dc59ac27b8fc015cb340424c355ab7cfa837a90d4",
+    "verified": []
   },
   "conformer-boltzmann-ranking": {
     "path": "tasks/chemistry/conformer-boltzmann-ranking",
-    "release": "f7c17a242cad816166d0a42817724ab657f66ed081acdfd1be10a2c0fcf94e20",
-    "verified": [
-      "dea62e6b6266168d3f4cd52f31c16f25d9442ca0e16f127e557ccc297279c6fa"
-    ]
+    "release": "c5517233368bb2a46a7fa707b690754ca899437ac381367a6cbba76ac4eeedd8",
+    "verified": []
   },
   "gas-thermochemistry-equilibrium": {
     "path": "tasks/chemistry/gas-thermochemistry-equilibrium",
-    "release": "6b0066247e00ff3a4f0bb72fde73310727852fb19a0091eef41b7c7e9465d80a",
-    "verified": [
-      "017719c56763bb0f6cc151e2a7cc99ac4d51545d0f6680bf8afe43f7a43e2a65"
-    ]
+    "release": "996ab564269d30cae333f4a379d842f338eaa7bf3d49d00e6b0bde71ae6fb8e8",
+    "verified": []
   },
   "ghs-hazard-summary": {
     "path": "tasks/chemistry/ghs-hazard-summary",
-    "release": "98393ae659d53301071eff46c63fd178249a03f50f5d642c8799fded9ed7fb9b",
-    "verified": [
-      "f7b70a6c6c40c30226daac7b60c544ba9217c4b5bbbc083fa82618b16059b0d9"
-    ]
+    "release": "ad53a53f638bc810755432f4fa94e304533346ae4c77522b60efd020134d32de",
+    "verified": []
   },
   "ir-spectrum-match": {
     "path": "tasks/chemistry/ir-spectrum-match",
-    "release": "6beaf4271599e90ce677303c834bb12ec6834ea75ed95f6b49e7c99e6abb91dd",
-    "verified": [
-      "cac542a8f79f4b96459a87b92c42e27c45b507a905a76f4f9cff59908d75ebd4"
-    ]
+    "release": "47328d8d5afe0de53874e52ebe74203a13c06eb672dd931a99f086861aa33007",
+    "verified": []
   },
   "mof-dac-screening": {
     "path": "tasks/chemistry/mof-dac-screening",
-    "release": "40538eb13f217666f2e218c0d0abbfb45c71489aff7881ab6ee74cc480e9c88a",
-    "verified": [
-      "fba565cb80cc677dd4baa66956dad2a6549274b6b2cb5ee1de8a656f0a1110b7"
-    ]
+    "release": "7a7e9e3fca737664943de3ea5145a645f4714f67ae07c1c792271eb181531c22",
+    "verified": []
   },
   "nmr-reaction-kinetics": {
     "path": "tasks/chemistry/nmr-reaction-kinetics",
-    "release": "befee756caf0369f08033f6c9bb121a296cc33c1b72ebc7aeb11d008c6c33f24",
-    "verified": [
-      "31933e684d2118cd8679895e0e074d02c8afad88aa7f30e6c2152dd6e5827afb",
-      "befee756caf0369f08033f6c9bb121a296cc33c1b72ebc7aeb11d008c6c33f24"
-    ]
+    "release": "0813f74947e9486f5e14d75c195abfeb026c163df792b9476a67af76b68a66ef",
+    "verified": []
   },
   "admet-lead-triage": {
     "path": "tasks/drug-discovery/admet-lead-triage",
-    "release": "0b1c3236879c8ae0a5a41e9cf9a186fc63897c79a47e1910317653c2e6e3a2dc",
-    "verified": [
-      "05c3e0d07dfd0daf8e0e109da451d5977cb494fd7469bf1585bfc15a8989209e",
-      "b1f017eb19a17d36cb8f2a8805201a5080ac49967650a5d5f7e0befbadd932a2"
-    ]
+    "release": "df448e2baf8aae44ff2d39506e3c31b10d23b1ce4b0a536422060cba7d07c947",
+    "verified": []
   },
   "docking-microstate-enrichment": {
     "path": "tasks/drug-discovery/docking-microstate-enrichment",
-    "release": "982a4587b09f37f5c0a815d8b873dda7f86ce6fbb1d6ffdf8e3c6b9b41d466b2",
-    "verified": [
-      "b3bec91aa46e2226fdb2d384c3dc2b7a8cc849f6232d8d4bed00b0620c287648"
-    ]
+    "release": "7d38c1e0de1a5ef654e9b7a90de935ba467cd84f9bd13b5cb5ab41fbdd4a931c",
+    "verified": []
   },
   "ecfp-analog-diversity": {
     "path": "tasks/drug-discovery/ecfp-analog-diversity",
-    "release": "aaa6a8998e84347b1476e0313c4c1f14bb7cf6ed3ece76093a08e24d4cae7c68",
-    "verified": [
-      "aaa6a8998e84347b1476e0313c4c1f14bb7cf6ed3ece76093a08e24d4cae7c68"
-    ]
+    "release": "99f2632b950e696c9762a92fa669e1e9a8f37fe0f8be08acd0f29e764212f6db",
+    "verified": []
   },
   "ligand-box-definition": {
     "path": "tasks/drug-discovery/ligand-box-definition",
-    "release": "3190f4cb93277a012aef4a78cfb0b549cdc2cb740179072224bf6d9c5ce33e3f",
-    "verified": [
-      "4779e4d4c6159aa53292eae0f6e97f28d8daa3197d734cc2d6200ae48ab25c3a",
-      "d20f871671590e50d68836e3adbd5d95be90decf088e1a346208e67a13b33d6b"
-    ]
+    "release": "a194a6b30955682a8702570aaceb644739e9b553f2936bde11e0be0ead163cf9",
+    "verified": []
   },
   "ligand-md-stability": {
     "path": "tasks/drug-discovery/ligand-md-stability",
-    "release": "ba17b267921ca3c4f9e84bf21d2088c99001a811bdf1515116271fb62790408c",
-    "verified": [
-      "a8fb008bbe13f3f82aed82f17b6b734376be3b6076d45f1fd92d47479d292059"
-    ]
+    "release": "2555680927f154bd52fab5ce9bdc1693de257c5137ca957c4af7c58c37534d21",
+    "verified": []
   },
   "pose-quality-filter": {
     "path": "tasks/drug-discovery/pose-quality-filter",
-    "release": "f1c093712f390ed01b328ef58f665b174b333602cab1f67354e7d09e2e73bfbc",
-    "verified": [
-      "f1c093712f390ed01b328ef58f665b174b333602cab1f67354e7d09e2e73bfbc"
-    ]
+    "release": "e28aa08426916ff99e47e39bced9515f10fbe5aa99753f62efa5da34e85b0804",
+    "verified": []
   },
   "symmetry-redocking-rmsd": {
     "path": "tasks/drug-discovery/symmetry-redocking-rmsd",
-    "release": "a6b636f50d127dcf91980577e48b2fc74184d1769784cdd6042a0a512c28f212",
-    "verified": [
-      "8888d80b9379506bbddf499ca0d4f52ab9c408f568cdb9c6d5cee8c3163fb7f5"
-    ]
+    "release": "1f9b1dadf4dbac9ad6b30671a5658e8c353db128bd48d232648410a8b46396fd",
+    "verified": []
   },
   "committee-uncertainty-flagging": {
     "path": "tasks/machine-learning/committee-uncertainty-flagging",
-    "release": "c0488effcdc4af8af0fc9841bee787acf755b02ed732d4b9a1ea11a5a1c94bd4",
-    "verified": [
-      "3ad4dc0aad743c05005c9e3afb0268a99cfb2f5a875f28a0c5e9fd150ec62441"
-    ]
+    "release": "d3160c69bac72bc7c6a46be6442d989e8b19ce65c42b7156ab9fc3e53a69be3a",
+    "verified": []
   },
   "mlip-error-benchmark": {
     "path": "tasks/machine-learning/mlip-error-benchmark",
-    "release": "2bbfc4c802d1e7c919f07ffb47cc7cd61a757eab934f2a3bd9cbb84ef5e648c1",
-    "verified": [
-      "2bbfc4c802d1e7c919f07ffb47cc7cd61a757eab934f2a3bd9cbb84ef5e648c1"
-    ]
+    "release": "795154bc675bd414a5e24566cd8b390ba34c8b74d6bc37a282b92364c0833429",
+    "verified": []
   },
   "camgsi-elasticity-vrh": {
     "path": "tasks/materials-science/camgsi-elasticity-vrh",
-    "release": "9fe1d2bc334bae8306f038a243e30357f5b5c7e128c948196ad0c8e5d5b1293d",
-    "verified": [
-      "220032bd6ed0e5e8c7bf4d9435bee0c37dc535519c43ca1ab805bc292ffb526b",
-      "af210f6c008dfd7012f2f1a75b5a69b80f90766f0f81f6d19a9546ffe4d2968b"
-    ]
+    "release": "ba35dad6b1f38b97b18b16959d075725fbdb4d0903268fde575a748e0070c23a",
+    "verified": []
   },
   "co-adsorption-cu111": {
     "path": "tasks/materials-science/co-adsorption-cu111",
-    "release": "af3600afb9327f3d9cc308e6fc468103b71e82d29ac95f7e96b44a59a20ea650",
-    "verified": [
-      "84b5ec9a182fc14d4c37271a2af44a6e779488d57dda1c8b6058c8293fb20d78"
-    ]
+    "release": "460b36aefb177600f2283794688f7f4e112335f35bea24e48c0fda95dadfd1af",
+    "verified": []
   },
   "convex-hull-stability": {
     "path": "tasks/materials-science/convex-hull-stability",
-    "release": "383aeac8d9d16e6843ca49c1ce5bc40e26143d1edf816d8944af14a07118926d",
-    "verified": [
-      "383aeac8d9d16e6843ca49c1ce5bc40e26143d1edf816d8944af14a07118926d"
-    ]
+    "release": "ca65bc836dd339eadc5d40991fb3960b3518aa85d798f82b8cfda01d9eb370c2",
+    "verified": []
   },
   "crconi-order-disorder": {
     "path": "tasks/materials-science/crconi-order-disorder",
-    "release": "2d13792e5f89b40368c5509ef2c7434840f2a5227e516224f6b44c4e150ac051",
-    "verified": [
-      "e8bcc58e30dab012a43d15a749e1112ac0af40732bad4936b689766c55065deb",
-      "f09fa9e79b19b595e5f24786baa0863ed2ba09b45d51146fe677b783873562fc"
-    ]
+    "release": "8c4e05dae84a46d6ec6034960e29a2191401a105263345201a862eb1d601a627",
+    "verified": []
   },
   "electrochemical-window": {
     "path": "tasks/materials-science/electrochemical-window",
-    "release": "86a278e2a9cc4dbe00013992767f633d9b6937dc0818d042ad1cd0e2442fd2ad",
-    "verified": [
-      "946c0cd8c3639e45145e16b9ac25d3a24f6e8e4e532bd579253122fe99c6e0a9"
-    ]
+    "release": "950717f3565e32f6bd21341db0e628405d31d920632b194dcc7171e098461b5d",
+    "verified": []
   },
   "li-qha-simulation": {
     "path": "tasks/materials-science/li-qha-simulation",
-    "release": "8bb08aba36494c9a494c0ee3dc2560598b1aaffefbe295778a88b1232d5e5dd6",
-    "verified": [
-      "ccf765d81ec94a97c611f180cb2d3c697aa97ebc19e349f1d28fbaf506ac0331"
-    ]
+    "release": "d57a1d5b0c4ec19aaf14c4feb1e5eb5a5864004240c1d912963641b2a27e1bb6",
+    "verified": []
   },
   "lifepo4-intercalation-voltage": {
     "path": "tasks/materials-science/lifepo4-intercalation-voltage",
-    "release": "f3d18f7cfcdff5d5774d0250b2f94a3211223da44e34c07f1e117cdc95e21c2c",
-    "verified": [
-      "f3d18f7cfcdff5d5774d0250b2f94a3211223da44e34c07f1e117cdc95e21c2c"
-    ]
+    "release": "ac54c1d7c6d1b4a26885e04eabb9ebb7442a53e38ad6a2d3552f2eb9d1512a4d",
+    "verified": []
   },
   "mgo-vacancy-energy": {
     "path": "tasks/materials-science/mgo-vacancy-energy",
-    "release": "a65136604942828fffcf782ece8b294bcf44c6c94b8e29cad6785eae1a835371",
-    "verified": [
-      "a65136604942828fffcf782ece8b294bcf44c6c94b8e29cad6785eae1a835371"
-    ]
+    "release": "8ae1028f0b26848916e440629eab1a84650cab2fb647577024dc087ad1c7e095",
+    "verified": []
   },
   "ni3al-surface-energy": {
     "path": "tasks/materials-science/ni3al-surface-energy",
-    "release": "39e9e701df8c67c874536c34e49eeac361dfd5da7e9f5d9c1e891de50c180256",
-    "verified": [
-      "39e9e701df8c67c874536c34e49eeac361dfd5da7e9f5d9c1e891de50c180256"
-    ]
+    "release": "fd069121a562c7bdfa4d451a1f6ef6aa126bec0d8f3a64a65ff0d10e65fb3081",
+    "verified": []
   },
   "nist-janaf-query": {
     "path": "tasks/materials-science/nist-janaf-query",
-    "release": "9d36197b652763c71df3ecf0f8e6e80c032e15e613f716271ee545ba61330bab",
-    "verified": [
-      "9d36197b652763c71df3ecf0f8e6e80c032e15e613f716271ee545ba61330bab"
-    ]
+    "release": "eac551c857a55e7b9d0de2e4ac09077d23182076ebd84ecd1be8b2f53519a72e",
+    "verified": []
   },
   "polymorph-free-energy": {
     "path": "tasks/materials-science/polymorph-free-energy",
-    "release": "94044004c6d89523c514f31a4be695e1fa8a7a1a5304cd12ae0864aa5695b480",
-    "verified": [
-      "4139b0564fb128d2a62c38bd9fcb4b2f52ad6f5cd5527506aedcbcf80f5204c6",
-      "71108b611892fe53effe67da1539ff0311202348573dd9fcde9172783259f5ae"
-    ]
+    "release": "939622538bfed165c412d6fa42e27b85635dbadc8f6b8bf812dc37607fded5a8",
+    "verified": []
   },
   "si-eos-fit": {
     "path": "tasks/materials-science/si-eos-fit",
-    "release": "8b1dacec0d93e152ee6476c20bcb386b885001bb4c62e2f9830f6d1cb9e5e1b5",
-    "verified": [
-      "03055bdd7f82dfcc3bb50942d09b5d6dac1d5ad333ca5bb92dd399645b405165"
-    ]
+    "release": "dbaec37f95314342e56621fb60c04973f48143afafd9833cebeacaccf6c70744",
+    "verified": []
   },
   "sic-thermal-conductivity": {
     "path": "tasks/materials-science/sic-thermal-conductivity",
-    "release": "de7d1810744d56a74503d6e481ee44e79fdcb1cdee632e3641a3231c6112f51e",
-    "verified": [
-      "de7d1810744d56a74503d6e481ee44e79fdcb1cdee632e3641a3231c6112f51e"
-    ]
+    "release": "6ad457b253705ff8f42f41eec8860fbe94a7af6768135d2fbe68c53fc09fa374",
+    "verified": []
   },
   "synthesis-precursor-recommendation": {
     "path": "tasks/materials-science/synthesis-precursor-recommendation",
-    "release": "b3323a29a9ceeabd47647d1e5c9d97028cd71f0e18244fa2226799fc348934b1",
-    "verified": [
-      "154c0150f8532b3044bacdbe846919458ed2e2a790d04722d81ed70c35f0ce75",
-      "66de4a828fbcb1f15799dd1a25dcaa37bd531c5c558ae8ca24dbe2b63bb69822"
-    ]
+    "release": "f73b3b505f2a473cd9eb7ca1649ab49a064b69e87dac83c9785ab36c4f56d3cb",
+    "verified": []
   },
   "xrd-mixture-phase-fit": {
     "path": "tasks/materials-science/xrd-mixture-phase-fit",
-    "release": "3d1439ddba00d26e1f2eb9d20cf57ac93bd7225f0cc6302643523ea46e7143ff",
-    "verified": [
-      "3d1439ddba00d26e1f2eb9d20cf57ac93bd7225f0cc6302643523ea46e7143ff",
-      "64d2efa4c363a2eafb9a49c16442ad5d7316782243e8fe82d9c8a8e19055cf26"
-    ]
+    "release": "cb918cac9c9f02edab434f9fa3c38d7cc3276d0eae7eac2b3395fde6a33b0db7",
+    "verified": []
   }
 }
