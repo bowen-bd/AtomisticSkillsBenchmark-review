@@ -71,6 +71,7 @@ DEFAULT_OUT_DIR = "site"
 # Navbar "GitHub" link; override with --repo-url.
 REPO_URL = "https://github.com/learningmatter-mit/AtomisticSkillsBenchmark"
 SITE_ASSETS = os.path.join(_script_dir, "site_assets")
+BENCHMARK_VERSION = "v" + (Path(__file__).resolve().parents[2] / "VERSION").read_text(encoding="utf-8").strip()
 
 # "pass" (the nav badge) and the order of this list are recomputed from the trials
 # on every build: descending no-skills pass rate, the rank key of the leaderboard.
@@ -2210,7 +2211,7 @@ def render_leaderboard_page(leaderboard: list[dict], out_path: str) -> None:
 
   <div class="hero">
     <div class="hero-inner">
-      <div class="hero-badge"><span class="dot"></span> CROSS-MODEL BENCHMARK LEADERBOARD</div>
+      <div class="hero-badge"><span class="dot"></span> CROSS-MODEL BENCHMARK LEADERBOARD · {html.escape(BENCHMARK_VERSION)}</div>
       
       <div class="hero-title-container">
         <img class="hero-title-logo" src="{html.escape(logo_src)}" alt="AtomisticSkills" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />

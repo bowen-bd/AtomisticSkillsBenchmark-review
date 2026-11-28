@@ -2,6 +2,7 @@
 
 ![AtomisticSkills Logo](scripts/atomisticskills/site_assets/logo/atomisticskills_logo.svg)
 
+[![Benchmark version](https://img.shields.io/badge/Benchmark-v0.2-816cff?style=for-the-badge)](VERSION)
 [![Leaderboard](https://img.shields.io/badge/Leaderboard-live-816cff?style=for-the-badge)](https://learningmatter-mit.github.io/AtomisticSkillsBenchmark/)
 [![arXiv](https://img.shields.io/badge/arXiv-2605.24002-b31b1b?style=for-the-badge)](https://arxiv.org/abs/2605.24002)
 [![AtomisticSkills](https://img.shields.io/badge/AtomisticSkills-toolkit-black?style=for-the-badge&logo=github)](https://github.com/learningmatter-mit/AtomisticSkills)
@@ -9,7 +10,13 @@
 
 > **📊 [View the leaderboard →](https://learningmatter-mit.github.io/AtomisticSkillsBenchmark/)** Pass rates for 7 models on all 31 tasks,
 > with and without AtomisticSkills, plus per-model dashboards and a task catalog
-> with grading rubrics.
+> with grading rubrics. Published historical results are not measurements on
+> the current task revisions.
+
+**Current benchmark specification: [v0.2](VERSION).** This revision hardens
+runtime isolation and verifier behavior and revises three task rubrics. See the
+[release and historical audit notes](docs/issue-1/README.md) for what changed,
+what was regraded, and the preserved v0.1 snapshot.
 
 A benchmark of 31 computational-science tasks for AI agents working in a terminal,
 spanning chemistry, drug discovery, machine-learned interatomic potentials
@@ -178,8 +185,13 @@ and audits old results without treating them as measurements of the revised task
 
 ## Website
 
-The [leaderboard site](https://learningmatter-mit.github.io/AtomisticSkillsBenchmark/) is generated from finished trials and published
-from the `gh-pages` branch:
+The [public leaderboard](https://learningmatter-mit.github.io/AtomisticSkillsBenchmark/)
+is published separately from the `gh-pages` branch. The v0.2 historical site
+update regrades the original published cohort without treating it as new runs.
+The [v0.1 snapshot](https://github.com/learningmatter-mit/AtomisticSkillsBenchmark/tree/d9610cfcecfe8dc44d97c6a7546deee3caeb7d21)
+remains available by commit without being shown on the live leaderboard.
+
+To generate a separate report for current task revisions:
 
 ```bash
 python3 scripts/atomisticskills/build_site.py jobs/ -o site/
@@ -187,7 +199,7 @@ python3 scripts/atomisticskills/build_site.py jobs/ -o site/
 python3 scripts/atomisticskills/build_site.py jobs/ --archive -o site-with-archive/
 ```
 
-Build into a fresh output directory. The current site includes only scored,
+Build into a fresh output directory. This generated report includes only scored,
 exception-free trials of the shipped revisions, filtered before selecting the
 per-mode trial limit. `--archive` puts excluded records on a separate page and
 never adds them to these pass rates. The site builder does not read agents'

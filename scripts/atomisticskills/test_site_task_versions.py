@@ -94,6 +94,13 @@ class SiteTaskVersionFilterTests(unittest.TestCase):
         if reward is not None:
             (trial / "verifier" / "reward.txt").write_text(reward, encoding="utf-8")
 
+    def test_benchmark_version_matches_readme(self):
+        root = HERE.parents[1]
+        version = "v" + (root / "VERSION").read_text(encoding="utf-8").strip()
+        self.assertRegex(version, r"^v[0-9]+\.[0-9]+(?:\.[0-9]+)?$")
+        self.assertEqual(site.BENCHMARK_VERSION, version)
+        self.assertIn(f"[{version}](VERSION)", (root / "README.md").read_text(encoding="utf-8"))
+
     def test_default_collection_is_current_only(self):
         tasks, dropped = site.collect_trials([str(self.jobs)], str(self.repo), max_per_mode=3)
         trials = tasks[TASK_SLUG]["trials"]
@@ -170,6 +177,7 @@ class SiteTaskVersionFilterTests(unittest.TestCase):
         site.render_leaderboard_page(summary, str(landing))
         page = landing.read_text(encoding="utf-8")
         self.assertIn(site.CURRENT_ONLY_NOTE, page)
+        self.assertIn(f"CROSS-MODEL BENCHMARK LEADERBOARD · {site.BENCHMARK_VERSION}", page)
         self.assertNotIn("archive/index.html", page)
 
         site.ARCHIVE_ENABLED = True

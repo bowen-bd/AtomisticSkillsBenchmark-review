@@ -1,6 +1,6 @@
 # Issue 1: historical results and revised tasks
 
-These are audits of saved artifacts, not new model measurements. The original site is preserved at [its published snapshot](https://github.com/learningmatter-mit/AtomisticSkillsBenchmark/tree/d9610cfcecfe8dc44d97c6a7546deee3caeb7d21). We matched 54 displayed records, 18 for each task below, to saved trials using model, skill mode, reward and displayed telemetry. This was a post hoc match, not a preregistered trial manifest. Neither a regrade nor the absence of suspicious activity in a retained trace establishes how a model independently arrived at its answer.
+These are audits of saved artifacts, not new model measurements. The original site is preserved at [its published snapshot](https://github.com/learningmatter-mit/AtomisticSkillsBenchmark/tree/d9610cfcecfe8dc44d97c6a7546deee3caeb7d21). We matched 54 displayed records, 18 for each task below, to saved trials using model, skill mode, reward and displayed telemetry. This was a post hoc match, not a preregistered trial manifest. Of the 54 matched runs, 27 carry task checksums outside the original release or verified set. Neither a regrade nor the absence of suspicious activity in a retained trace establishes how a model independently arrived at its answer.
 
 | Task | What the saved evidence supports | Disposition |
 | --- | --- | --- |
@@ -12,6 +12,6 @@ The new electrochemical reference evaluates the supplied target, not the lowest-
 
 ## Reporting
 
-- The current leaderboard accepts only finished, scored, exception-free trials for the shipped task revisions; these filters are applied before the per-mode sample limit. Its optional archive tabulates excluded records separately and does not mix them into pass rates.
-- Historic published scores and the three audits above remain available. They do not populate the revised leaderboard. A missing current trial is not a failed trial. No retired model was rerun for these audits.
+- The v0.2 historical leaderboard keeps the original published cohort and applies the audits above. The original v0.1 scores remain available at the linked snapshot. No model was rerun for these audits.
+- The separate current-revision report accepts only finished, scored, exception-free trials for the shipped task revisions; these filters are applied before the per-mode sample limit. Its optional archive reports excluded records separately. A missing current trial is not a failed trial.
 - The public summaries contain counts and outcomes, not raw model traces, answer files, or credentials. Detailed route evidence and original trials remain with the benchmark operators.
