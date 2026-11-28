@@ -1356,7 +1356,7 @@ footer {
                 <span class="dropdown-item-runner">terminus-2</span>
               </div>
             </div>
-            <span class="dropdown-item-badge pass">74.2%</span>
+            <span class="dropdown-item-badge pass">71.0%</span>
           </a>
         
           <a class="dropdown-item" href="luna/index.html">
@@ -1421,7 +1421,7 @@ footer {
         </div>
         <div class="metric-divider"></div>
         <div class="metric-item tooltip-trigger">
-          <div class="metric-num">74.5%</div>
+          <div class="metric-num">74.0%</div>
           <div class="metric-desc">AVG NO-SKILL PASS</div>
           <div class="tooltip-box">Mean of the per-model no-skills pass rates across 7 models. Averaged per model rather than per trial, so a model sampled at k=3 does not count three times.</div>
         </div>
@@ -1449,6 +1449,7 @@ footer {
   </div>
 
   <main class="container">
+    <p class="metrics-note"><strong>v0.2 historical regrade.</strong> The original published cohort is unchanged. The synthesis review credits 17 of 18 saved answers under the original task rules. The table is not a measurement on the revised tasks. <a href="https://github.com/learningmatter-mit/AtomisticSkillsBenchmark/blob/main/docs/issue-1/README.md">Audit notes ↗</a> · <a href="https://github.com/learningmatter-mit/AtomisticSkillsBenchmark/tree/d9610cfcecfe8dc44d97c6a7546deee3caeb7d21">Original v0.1 snapshot ↗</a></p>
     <div class="card">
       <div class="card-title">
         <span>🏆 Model Performance Leaderboard (Core 31 Evaluated Tasks)</span>
@@ -1534,7 +1535,7 @@ footer {
           </td>
           <td class="action-col"><a class="btn-action" href="sol/index.html">Explore &rarr;</a></td>
         </tr>
-        
+
         <tr>
           <td style="text-align:center;"><span class="rank-badge rank-2">2</span></td>
           <td>
@@ -1598,26 +1599,6 @@ footer {
         <tr>
           <td style="text-align:center;"><span class="rank-badge">5</span></td>
           <td>
-            <a class="model-link" href="deepseek-v4-flash/index.html"><strong>DeepSeek V4 Flash</strong></a>
-            <div style="font-size:0.75rem; color:var(--muted);">k=1 (62 runs)</div>
-          </td>
-          <td><span class="badge badge-agent">terminus-2</span></td>
-          <td><strong>74.2%</strong><span class="sub-stat rate-sub">(23/31)</span></td>
-          <td><strong>87.1%</strong><span class="sub-stat rate-sub">(27/31)</span></td>
-          <td><span class="badge badge-pass">+12.9%</span></td>
-          <td style="font-family:'JetBrains Mono',monospace;"><span class="val-with">52m</span><span class="sep">/</span><span class="val-no">65m</span></td>
-          <td style="font-family:'JetBrains Mono',monospace;"><span class="val-with">60.5k</span><span class="sep">/</span><span class="val-no">78.0k</span></td>
-          <td><span class="badge badge-pass">22.5%</span></td>
-          <td style="font-family:'JetBrains Mono',monospace;">
-            <strong>$10.92</strong>
-            <div style="font-size:0.72rem; color:var(--muted);">62 runs</div>
-          </td>
-          <td class="action-col"><a class="btn-action" href="deepseek-v4-flash/index.html">Explore &rarr;</a></td>
-        </tr>
-        
-        <tr>
-          <td style="text-align:center;"><span class="rank-badge">6</span></td>
-          <td>
             <a class="model-link" href="luna/index.html"><strong>GPT-5.6 Luna</strong></a>
             <div style="font-size:0.75rem; color:var(--muted);">k=3 (186 runs)</div>
           </td>
@@ -1635,6 +1616,26 @@ footer {
           <td class="action-col"><a class="btn-action" href="luna/index.html">Explore &rarr;</a></td>
         </tr>
         
+        <tr>
+          <td style="text-align:center;"><span class="rank-badge">6</span></td>
+          <td>
+            <a class="model-link" href="deepseek-v4-flash/index.html"><strong>DeepSeek V4 Flash</strong></a>
+            <div style="font-size:0.75rem; color:var(--muted);">k=1 (62 runs)</div>
+          </td>
+          <td><span class="badge badge-agent">terminus-2</span></td>
+          <td><strong>71.0%</strong><span class="sub-stat rate-sub">(22/31)</span></td>
+          <td><strong>87.1%</strong><span class="sub-stat rate-sub">(27/31)</span></td>
+          <td><span class="badge badge-pass">+16.1%</span></td>
+          <td style="font-family:'JetBrains Mono',monospace;"><span class="val-with">52m</span><span class="sep">/</span><span class="val-no">65m</span></td>
+          <td style="font-family:'JetBrains Mono',monospace;"><span class="val-with">60.5k</span><span class="sep">/</span><span class="val-no">78.0k</span></td>
+          <td><span class="badge badge-pass">22.5%</span></td>
+          <td style="font-family:'JetBrains Mono',monospace;">
+            <strong>$10.92</strong>
+            <div style="font-size:0.72rem; color:var(--muted);">62 runs</div>
+          </td>
+          <td class="action-col"><a class="btn-action" href="deepseek-v4-flash/index.html">Explore &rarr;</a></td>
+        </tr>
+
         <tr>
           <td style="text-align:center;"><span class="rank-badge">7</span></td>
           <td>
@@ -1802,41 +1803,8 @@ footer {
         <div class="model-card">
           <div>
             <div class="model-card-header">
-              <span class="model-card-title">DeepSeek V4 Flash</span>
-              <span class="rank-badge">5</span>
-            </div>
-            <div style="font-size:0.82rem; color:var(--muted); margin-bottom:8px;">
-              Runner: <span class="badge badge-agent">terminus-2</span> &bull; Sampling: <strong>k=1 (62 runs)</strong> &bull; Cost: <strong>$10.92</strong>
-            </div>
-            <div class="model-card-stats">
-              <div class="stat-box">
-                <div class="stat-val">74.2%</div>
-                <div class="stat-lbl">No Skills (23/31)</div>
-              </div>
-              <div class="stat-box">
-                <div class="stat-val" style="color:#16a34a;">87.1%</div>
-                <div class="stat-lbl">With Skills (27/31)</div>
-              </div>
-              <div class="stat-box">
-                <div class="stat-val" style="color:#816cff;">+12.9%</div>
-                <div class="stat-lbl">Skill Boost &Delta;</div>
-              </div>
-              <div class="stat-box">
-                <div class="stat-val" style="color:#0284c7; font-size:1.05rem; font-family:'JetBrains Mono',monospace;">52m / 65m</div>
-                <div class="stat-lbl">Time (With / No)</div>
-              </div>
-            </div>
-          </div>
-          <a class="btn-action" href="deepseek-v4-flash/index.html" style="text-align:center; margin-top:8px; display:block; padding:8px;">
-            View Detailed 31-Task Breakdown &rarr;
-          </a>
-        </div>
-        
-        <div class="model-card">
-          <div>
-            <div class="model-card-header">
               <span class="model-card-title">GPT-5.6 Luna</span>
-              <span class="rank-badge">6</span>
+              <span class="rank-badge">5</span>
             </div>
             <div style="font-size:0.82rem; color:var(--muted); margin-bottom:8px;">
               Runner: <span class="badge badge-agent">codex</span> &bull; Sampling: <strong>k=3 (186 runs)</strong> &bull; Cost: <strong>$14.30</strong>
@@ -1861,6 +1829,39 @@ footer {
             </div>
           </div>
           <a class="btn-action" href="luna/index.html" style="text-align:center; margin-top:8px; display:block; padding:8px;">
+            View Detailed 31-Task Breakdown &rarr;
+          </a>
+        </div>
+        
+        <div class="model-card">
+          <div>
+            <div class="model-card-header">
+              <span class="model-card-title">DeepSeek V4 Flash</span>
+              <span class="rank-badge">6</span>
+            </div>
+            <div style="font-size:0.82rem; color:var(--muted); margin-bottom:8px;">
+              Runner: <span class="badge badge-agent">terminus-2</span> &bull; Sampling: <strong>k=1 (62 runs)</strong> &bull; Cost: <strong>$10.92</strong>
+            </div>
+            <div class="model-card-stats">
+              <div class="stat-box">
+                <div class="stat-val">71.0%</div>
+                <div class="stat-lbl">No Skills (22/31)</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" style="color:#16a34a;">87.1%</div>
+                <div class="stat-lbl">With Skills (27/31)</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" style="color:#816cff;">+16.1%</div>
+                <div class="stat-lbl">Skill Boost &Delta;</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-val" style="color:#0284c7; font-size:1.05rem; font-family:'JetBrains Mono',monospace;">52m / 65m</div>
+                <div class="stat-lbl">Time (With / No)</div>
+              </div>
+            </div>
+          </div>
+          <a class="btn-action" href="deepseek-v4-flash/index.html" style="text-align:center; margin-top:8px; display:block; padding:8px;">
             View Detailed 31-Task Breakdown &rarr;
           </a>
         </div>
@@ -1913,14 +1914,14 @@ footer {
           <strong>• Efficiency &amp; Prefix Caching:</strong> Multi-turn autonomous coding agents leverage prompt prefix caching (<code>usage.prompt_tokens_details.cached_tokens</code>). Because domain skill documentation (<code>SKILL.md</code> playbooks) is read in early episodes, it stays resident in cache across subsequent turns, enabling &gt;85%–97% cache hit rates at discounted input pricing.
         </p>
         <p style="margin: 0;">
-          <strong>• Cost Calculation:</strong> Total evaluated cost reflects exact provider API billing rates across all 540 evaluated multi-turn runs (180 for Luna, 60 for each of the other 6 models).
+          <strong>• Cost Calculation:</strong> Total evaluated cost reflects exact provider API billing rates across all 558 evaluated multi-turn runs (186 for Luna, 62 for each of the other 6 models).
         </p>
       </div>
     </div>
   </main>
 
   <footer>
-    <p>AtomisticSkills Benchmark Leaderboard &bull; Auto-generated on 2026-10-02 01:27:07 &bull; <a href="https://learningmatter-mit.github.io/AtomisticSkills/" target="_blank" style="color:var(--accent); text-decoration:none;">AtomisticSkills Docs</a> &bull; <a href="https://github.com/learningmatter-mit/AtomisticSkills" target="_blank" style="color:var(--accent); text-decoration:none;">AtomisticSkills GitHub</a></p>
+    <p>AtomisticSkills Benchmark Leaderboard &bull; v0.2 historical regrade &bull; <a href="https://learningmatter-mit.github.io/AtomisticSkills/" target="_blank" style="color:var(--accent); text-decoration:none;">AtomisticSkills Docs</a> &bull; <a href="https://github.com/learningmatter-mit/AtomisticSkills" target="_blank" style="color:var(--accent); text-decoration:none;">AtomisticSkills GitHub</a></p>
   </footer>
 </body>
 </html>
