@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "task": "synthesis-precursor-recommendation",
+  "published_site_commit": "d9610cfcecfe8dc44d97c6a7546deee3caeb7d21",
+  "summary": {"cards": 18, "pass": 17, "not_verified": 1, "forward_rule_pass_diagnostic": 13},
+  "method": "The original prompt asked for at least five distinct published precursor combinations; it did not restrict distinctness to Na, V, and P providers. The historical regrade counts sourced sets as reported, including documented differences in ancillary reagents, normalizes hydration as the prompt specified, and does not penalize extra unsupported sets if five valid sets remain. This is a regrade of saved answers, not a record of fresh runs. A score of zero means fewer than five combinations were verified against the audited sources.",
+  "cards": [
+    {"label": "GPT-5.6 Sol", "skills": true, "number": 1, "supported_distinct_combinations": 5, "status": "pass"},
+    {"label": "GPT-5.6 Sol", "skills": false, "number": 1, "supported_distinct_combinations": 5, "status": "pass"},
+    {"label": "Gemini 3.7 Flash", "skills": true, "number": 1, "supported_distinct_combinations": 6, "status": "pass"},
+    {"label": "Gemini 3.7 Flash", "skills": false, "number": 1, "supported_distinct_combinations": 7, "status": "pass"},
+    {"label": "Claude Opus 5", "skills": true, "number": 1, "supported_distinct_combinations": 6, "status": "pass"},
+    {"label": "Claude Opus 5", "skills": false, "number": 1, "supported_distinct_combinations": 6, "status": "pass"},
+    {"label": "GLM-5.3 Flash", "skills": true, "number": 1, "supported_distinct_combinations": 5, "status": "pass"},
+    {"label": "GLM-5.3 Flash", "skills": false, "number": 1, "supported_distinct_combinations": 5, "status": "pass"},
+    {"label": "DeepSeek V4 Flash", "skills": true, "number": 1, "supported_distinct_combinations": 5, "status": "pass"},
+    {"label": "DeepSeek V4 Flash", "skills": false, "number": 1, "supported_distinct_combinations": 2, "status": "not_verified"},
+    {"label": "GPT-5.6 Luna", "skills": true, "number": 1, "supported_distinct_combinations": 5, "status": "pass"},
+    {"label": "GPT-5.6 Luna", "skills": true, "number": 2, "supported_distinct_combinations": 5, "status": "pass"},
+    {"label": "GPT-5.6 Luna", "skills": true, "number": 3, "supported_distinct_combinations": 5, "status": "pass"},
+    {"label": "GPT-5.6 Luna", "skills": false, "number": 1, "supported_distinct_combinations": 5, "status": "pass"},
+    {"label": "GPT-5.6 Luna", "skills": false, "number": 2, "supported_distinct_combinations": 5, "status": "pass"},
+    {"label": "GPT-5.6 Luna", "skills": false, "number": 3, "supported_distinct_combinations": 5, "status": "pass"},
+    {"label": "Qwen3.8-27B", "skills": true, "number": 1, "supported_distinct_combinations": 5, "status": "pass"},
+    {"label": "Qwen3.8-27B", "skills": false, "number": 1, "supported_distinct_combinations": 5, "status": "pass"}
+  ]
+}

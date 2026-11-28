@@ -8,6 +8,7 @@ from typing import Any
 
 import matgl
 import numpy as np
+import pytest
 from ase.io import read
 from matgl.ext.ase import PESCalculator
 
@@ -103,7 +104,10 @@ def test_mlip_benchmark_metrics() -> None:
     result_path = Path("/root/results/result.json")
     assert result_path.exists(), "Missing /root/results/result.json"
     got = json.loads(result_path.read_text())
-    expected = benchmark()
+    try:
+        expected = benchmark()
+    except Exception as exc:
+        pytest.exit(f'Could not compute the MLIP verifier reference: {exc!r}', returncode=3)
     tolerances = {
         "energy_mae_meV_atom": 1.0e-3,
         "energy_rmse_meV_atom": 1.0e-3,

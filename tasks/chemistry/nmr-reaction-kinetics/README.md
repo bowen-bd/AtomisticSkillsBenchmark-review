@@ -10,7 +10,7 @@
 
 ## Input Records
 
-The runtime inputs are `/root/data/reference_buckets.csv` and `/root/data/mixture_buckets.csv`. They are bucketed spectra on a shared ppm axis, with reference columns scaled consistently for component abundance. The task is a lightweight deterministic analogue of the full Wasserstein NMR deconvolution workflow: it preserves the scientific requirement to unmix overlapping spectra before fitting kinetics, while avoiding large external spectral dependencies in Harbor.
+The input is `/root/data/mixture_buckets.csv`, the reaction time series on a shared ppm axis. The reference solution obtains molecule geometries from the NCI Chemical Identifier Resolver and predicts reference spectra with NMRdb. The agent may reach those two services; the verifier checks local reference values without making network requests.
 
 ## Expected Scientific Quantities
 

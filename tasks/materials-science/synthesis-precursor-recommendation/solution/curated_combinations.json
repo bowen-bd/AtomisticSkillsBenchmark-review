@@ -1,0 +1,10 @@
+{
+  "target_formula": "Na3V2(PO4)3",
+  "precursor_combinations": [
+    ["NaOH", "NH4VO3", "NH4H2PO4"],
+    ["Na2CO3", "NH4H2PO4", "V2O5"],
+    ["NaH2PO4·2H2O", "V2O5"],
+    ["NaH2PO4·2H2O", "V2O3"],
+    ["NaH2PO4·H2O", "NH4VO3"]
+  ]
+}

@@ -2,6 +2,7 @@
 
 ![AtomisticSkills Logo](scripts/atomisticskills/site_assets/logo/atomisticskills_logo.svg)
 
+[![Benchmark version](https://img.shields.io/badge/Benchmark-v0.2-816cff?style=for-the-badge)](VERSION)
 [![Leaderboard](https://img.shields.io/badge/Leaderboard-live-816cff?style=for-the-badge)](https://learningmatter-mit.github.io/AtomisticSkillsBenchmark/)
 [![arXiv](https://img.shields.io/badge/arXiv-2605.24002-b31b1b?style=for-the-badge)](https://arxiv.org/abs/2605.24002)
 [![AtomisticSkills](https://img.shields.io/badge/AtomisticSkills-toolkit-black?style=for-the-badge&logo=github)](https://github.com/learningmatter-mit/AtomisticSkills)
@@ -9,13 +10,19 @@
 
 > **📊 [View the leaderboard →](https://learningmatter-mit.github.io/AtomisticSkillsBenchmark/)** Pass rates for 7 models on all 31 tasks,
 > with and without AtomisticSkills, plus per-model dashboards and a task catalog
-> with grading rubrics.
+> with grading rubrics. Published historical results are not measurements on
+> the current task revisions.
+
+**Current benchmark specification: [v0.2](VERSION).** This revision hardens
+runtime isolation and verifier behavior and revises three task rubrics. See the
+[release and historical audit notes](docs/issue-1/README.md) for what changed,
+what was regraded, and the preserved v0.1 snapshot.
 
 A benchmark of 31 computational-science tasks for AI agents working in a terminal,
 spanning chemistry, drug discovery, machine-learned interatomic potentials
 and materials science. Each task is a self-contained
 [Harbor](https://harborframework.com) task: a natural-language instruction, a
-Docker environment, a reference solution and a hidden verifier.
+Docker environment, a reference solution and a verifier isolated from the agent.
 
 The tasks are derived from the workflows covered by the
 [AtomisticSkills](https://github.com/learningmatter-mit/AtomisticSkills) toolkit,
@@ -71,7 +78,7 @@ describing provenance, the reference values and how the tolerances were derived.
 | [`co-adsorption-cu111`](tasks/materials-science/co-adsorption-cu111/) | materials-science | GPU |
 | [`convex-hull-stability`](tasks/materials-science/convex-hull-stability/) | stability | GPU, `MP_API_KEY` |
 | [`crconi-order-disorder`](tasks/materials-science/crconi-order-disorder/) | alloy thermodynamics | GPU |
-| [`electrochemical-window`](tasks/materials-science/electrochemical-window/) | electrochemistry | GPU, `MP_API_KEY` |
+| [`electrochemical-window`](tasks/materials-science/electrochemical-window/) | electrochemistry | GPU |
 | [`li-qha-simulation`](tasks/materials-science/li-qha-simulation/) | materials-science | GPU |
 | [`lifepo4-intercalation-voltage`](tasks/materials-science/lifepo4-intercalation-voltage/) | materials-science | GPU |
 | [`mgo-vacancy-energy`](tasks/materials-science/mgo-vacancy-energy/) | materials-science | GPU, `MP_API_KEY` |
@@ -90,11 +97,13 @@ the host environment before launching.
 
 ## Running
 
-Requirements: Docker, [Harbor](https://harborframework.com/docs)
-(`uv tool install harbor`), and the API key your model provider expects in the
+Requirements: Docker, [Harbor](https://harborframework.com/docs) with network
+policy enforcement (`uv tool install 'harbor>=0.25.0'`; tested with 0.25.0),
+and the API key your model provider expects in the
 environment (e.g. `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`). Tasks marked
 `MP_API_KEY` above also need a [Materials Project](https://next-gen.materialsproject.org/api)
-key, and tasks marked GPU need one CUDA GPU.
+key for live queries (the bundled synthesis-precursor oracle can also run
+without one), and tasks marked GPU need one CUDA GPU.
 
 ```bash
 git clone https://github.com/learningmatter-mit/AtomisticSkillsBenchmark.git
@@ -107,8 +116,28 @@ harbor run -p tasks/drug-discovery/ecfp-analog-diversity -a oracle
 harbor run -p tasks/chemistry/bde-weak-bonds -a terminus-2 -m anthropic/claude-opus-4-8
 ```
 
-Any Harbor agent works (`-a terminus-2`, `claude-code`, `codex`, ...); `-m` takes
-the provider/model slug that agent expects.
+Use `-m` with the provider/model slug that the selected Harbor agent expects.
+
+### Network and verifier isolation
+
+Tasks default to no outbound network. Only the agent phase of tasks that use
+live scientific data may reach those specific services: Materials Project,
+NIST WebBook, PubChem, or the NCI resolver and NMRdb. Scientific model weights
+used by the bundled workflows are cached at Docker build time. The separate
+verifier has no outbound network.
+
+Agent images include the terminal tools needed by `terminus-2`. If an installed
+agent needs downloads during setup, preinstall it in the image or use Harbor's
+`--allow-environment-host` for the required package hosts. For custom in-container
+inference endpoints or additional scientific data sources, use
+`--allow-agent-host` for the specific hosts (include the inference host when
+providing manual overrides). Do not switch back to public networking for scored
+runs. Docker build-time access and host-side model calls are separate from the
+container policy.
+
+The references and solutions are public source code, not private test data.
+Network restrictions reduce in-trial lookup, but do not address memorization or
+contamination; use held-out inputs and private references for that purpose.
 
 ### With-skill mode
 
@@ -149,21 +178,32 @@ to `~/.codex/auth.json` for the `codex` agent when `OPENAI_API_KEY` is unset.
 python3 scripts/atomisticskills/pass_rates.py jobs/ -o pass-rates.md
 ```
 
-aggregates finished trials into per-model, per-task pass rates in each skill
-mode, with wall time, tokens and cost.
+aggregates finished, scored trials into per-model, per-task pass rates in each
+skill mode, with wall time, tokens and cost. By default it excludes older task
+revisions. The [Issue #1 historical review](docs/issue-1/README.md) preserves
+and audits old results without treating them as measurements of the revised tasks.
 
 ## Website
 
-The [leaderboard site](https://learningmatter-mit.github.io/AtomisticSkillsBenchmark/) is generated from finished trials and published
-from the `gh-pages` branch:
+The [public leaderboard](https://learningmatter-mit.github.io/AtomisticSkillsBenchmark/)
+is published separately from the `gh-pages` branch. The v0.2 historical site
+update regrades the original published cohort without treating it as new runs.
+The [v0.1 snapshot](https://github.com/learningmatter-mit/AtomisticSkillsBenchmark/tree/d9610cfcecfe8dc44d97c6a7546deee3caeb7d21)
+remains available by commit without being shown on the live leaderboard.
+
+To generate a separate report for current task revisions:
 
 ```bash
 python3 scripts/atomisticskills/build_site.py jobs/ -o site/
+# Optionally render older and unscored trial metadata on a separate page:
+python3 scripts/atomisticskills/build_site.py jobs/ --archive -o site-with-archive/
 ```
 
-It shows per-model and per-task pass rates in both skill modes, with wall time,
-token counts and cost. It never reads the agents' answer files, verifier logs or
-reasoning traces, so none of them are published.
+Build into a fresh output directory. This generated report includes only scored,
+exception-free trials of the shipped revisions, filtered before selecting the
+per-mode trial limit. `--archive` puts excluded records on a separate page and
+never adds them to these pass rates. The site builder does not read agents'
+answer files, verifier logs or reasoning traces.
 
 ## Repository layout
 

@@ -1,0 +1,641 @@
+{
+  "schema_version": 2,
+  "task": "nist-janaf-query",
+  "scope": "published NIST cards in the prior telemetry match",
+  "selection": {
+    "cards": 18,
+    "source": "prior model/mode/reward/telemetry match",
+    "explicit_trial_manifest": false
+  },
+  "summary": {
+    "cards": 18,
+    "by_status": {
+      "verified": 18,
+      "unverified": 0,
+      "unsupported": 0
+    },
+    "by_evidence": {
+      "direct_http": 6,
+      "parsed_http": 7,
+      "web_fetch_cache": 5,
+      "answer_only": 0,
+      "none": 0
+    },
+    "by_mode": {
+      "no-skill": 9,
+      "with-skill": 9
+    },
+    "by_model": {
+      "Claude Opus 5": 2,
+      "DeepSeek V4 Flash": 2,
+      "GLM-5.3 Flash": 2,
+      "GPT-5.6 Luna": 6,
+      "GPT-5.6 Sol": 2,
+      "Gemini 3.7 Flash": 2,
+      "Qwen3.8-27B": 2
+    },
+    "published_rewards": {
+      "1": 18
+    },
+    "verified_live_http": 13,
+    "verified_cached_web": 5,
+    "cached_web_after_first_result_write": 0,
+    "cached_web_order_unknown": 0,
+    "prompt_disclosed_values": 18,
+    "answers_match_expected": 18,
+    "all_public_cards_verified": true
+  },
+  "cards": [
+    {
+      "card": "nist-01",
+      "model": "Claude Opus 5",
+      "mode": "no-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "direct_http",
+        "step": 7,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": true,
+        "http_200_observed": false,
+        "http_error_observed": true,
+        "cached_web_content": false,
+        "recovered_from_http_error": true
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-02",
+      "model": "Claude Opus 5",
+      "mode": "with-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "parsed_http",
+        "step": 6,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": false,
+        "http_200_observed": false,
+        "http_error_observed": false,
+        "cached_web_content": false,
+        "recovered_from_http_error": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-03",
+      "model": "DeepSeek V4 Flash",
+      "mode": "no-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "direct_http",
+        "step": 6,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": true,
+        "http_200_observed": false,
+        "http_error_observed": true,
+        "cached_web_content": false,
+        "recovered_from_http_error": true
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-04",
+      "model": "DeepSeek V4 Flash",
+      "mode": "with-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "parsed_http",
+        "step": 6,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": false,
+        "http_200_observed": false,
+        "http_error_observed": false,
+        "cached_web_content": false,
+        "recovered_from_http_error": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-05",
+      "model": "GLM-5.3 Flash",
+      "mode": "no-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "direct_http",
+        "step": 6,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": true,
+        "http_200_observed": true,
+        "http_error_observed": false,
+        "cached_web_content": false,
+        "recovered_from_http_error": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-06",
+      "model": "GLM-5.3 Flash",
+      "mode": "with-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "parsed_http",
+        "step": 5,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": false,
+        "http_200_observed": false,
+        "http_error_observed": false,
+        "cached_web_content": false,
+        "recovered_from_http_error": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-07",
+      "model": "GPT-5.6 Luna",
+      "mode": "no-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "cached_web",
+        "kind": "web_fetch_cache",
+        "step": 8,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": false,
+        "http_200_observed": false,
+        "http_error_observed": true,
+        "cached_web_content": true,
+        "recovered_from_http_error": true,
+        "cached_after_first_result_write": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-08",
+      "model": "GPT-5.6 Luna",
+      "mode": "no-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "cached_web",
+        "kind": "web_fetch_cache",
+        "step": 6,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": false,
+        "http_200_observed": false,
+        "http_error_observed": false,
+        "cached_web_content": true,
+        "recovered_from_http_error": false,
+        "cached_after_first_result_write": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-09",
+      "model": "GPT-5.6 Luna",
+      "mode": "no-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "cached_web",
+        "kind": "web_fetch_cache",
+        "step": 5,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": false,
+        "http_200_observed": false,
+        "http_error_observed": false,
+        "cached_web_content": true,
+        "recovered_from_http_error": false,
+        "cached_after_first_result_write": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-10",
+      "model": "GPT-5.6 Luna",
+      "mode": "with-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "parsed_http",
+        "step": 8,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": false,
+        "http_200_observed": false,
+        "http_error_observed": false,
+        "cached_web_content": false,
+        "recovered_from_http_error": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-11",
+      "model": "GPT-5.6 Luna",
+      "mode": "with-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "cached_web",
+        "kind": "web_fetch_cache",
+        "step": 9,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": false,
+        "http_200_observed": false,
+        "http_error_observed": true,
+        "cached_web_content": true,
+        "recovered_from_http_error": true,
+        "cached_after_first_result_write": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-12",
+      "model": "GPT-5.6 Luna",
+      "mode": "with-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "parsed_http",
+        "step": 8,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": false,
+        "http_200_observed": false,
+        "http_error_observed": false,
+        "cached_web_content": false,
+        "recovered_from_http_error": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-13",
+      "model": "GPT-5.6 Sol",
+      "mode": "no-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "cached_web",
+        "kind": "web_fetch_cache",
+        "step": 7,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": false,
+        "http_200_observed": false,
+        "http_error_observed": false,
+        "cached_web_content": true,
+        "recovered_from_http_error": false,
+        "cached_after_first_result_write": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-14",
+      "model": "GPT-5.6 Sol",
+      "mode": "with-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "direct_http",
+        "step": 12,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": true,
+        "http_200_observed": false,
+        "http_error_observed": true,
+        "cached_web_content": false,
+        "recovered_from_http_error": true
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-15",
+      "model": "Gemini 3.7 Flash",
+      "mode": "no-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "direct_http",
+        "step": 9,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": true,
+        "http_200_observed": false,
+        "http_error_observed": true,
+        "cached_web_content": false,
+        "recovered_from_http_error": true
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-16",
+      "model": "Gemini 3.7 Flash",
+      "mode": "with-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "parsed_http",
+        "step": 5,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": false,
+        "http_200_observed": false,
+        "http_error_observed": false,
+        "cached_web_content": false,
+        "recovered_from_http_error": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-17",
+      "model": "Qwen3.8-27B",
+      "mode": "no-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "direct_http",
+        "step": 7,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": true,
+        "http_200_observed": false,
+        "http_error_observed": false,
+        "cached_web_content": false,
+        "recovered_from_http_error": false
+      },
+      "independent_retrieval_established": false
+    },
+    {
+      "card": "nist-18",
+      "model": "Qwen3.8-27B",
+      "mode": "with-skill",
+      "published_reward": 1.0,
+      "answer": {
+        "matches_expected": true,
+        "units_match_expected": true
+      },
+      "prompt": {
+        "disclosed_values": true
+      },
+      "evidence": {
+        "status": "verified",
+        "level": "live_http",
+        "kind": "parsed_http",
+        "step": 9,
+        "compound": true,
+        "values": {
+          "found": 2,
+          "expected": 2
+        },
+        "source_table": false,
+        "http_200_observed": false,
+        "http_error_observed": false,
+        "cached_web_content": false,
+        "recovered_from_http_error": false
+      },
+      "independent_retrieval_established": false
+    }
+  ],
+  "disposition": {
+    "keep_as_historical_cards": true,
+    "keep_as_current_hardened_scores": false,
+    "independent_retrieval_established": false,
+    "reason": "All 18 cards show a response-bearing record with the intended compound and every graded value, so the published pass is not answer-only. 5 cards show WebBook page content through cached web-fetch results rather than a container HTTP response; cached responses may arrive after an initial result write, so this is supporting evidence, not proof of derivation. No cached observation was first seen after a detected result write, but delivery ordering remains unproven. All 18 cards saw every graded value in the old prompt, so none establishes independent retrieval."
+  },
+  "method": {
+    "inputs": [
+      "task tests/expected.json (expected metadata, read at run time and not copied into this report)",
+      "prior published-card telemetry match",
+      "saved agent trajectories, read-only",
+      "saved final answers"
+    ],
+    "criteria": {
+      "prompt_disclosure": "every graded numeric value occurs in a system or user message",
+      "compound": "a compound name or registry identifier from the task reference occurs in the response-bearing output",
+      "values": "every graded numeric value from the task reference occurs in the response-bearing output",
+      "source_table": "a NIST reference-table marker occurs in the response-bearing output",
+      "direct_http": "HTTP 200, a NIST reference-table marker, a row-form output, or a successful download alongside the expected values",
+      "parsed_http": "agent output contains a raw value paired with a plus/minus term or a parsed NIST quantity table",
+      "web_fetch_cache": "platform web tool returned a page marked Crawled:"
+    },
+    "status_definitions": {
+      "verified": "the saved answer matches and response-bearing output shows the intended compound and every graded value; evidence.level distinguishes live HTTP from cached web content",
+      "unverified": "the saved answer matches but no response evidence was observed",
+      "unsupported": "the saved answer mismatches the expected answer"
+    },
+    "privacy": {
+      "raw_trajectories_included": false,
+      "trial_or_job_identifiers_included": false,
+      "hostnames_or_private_paths_included": false,
+      "prompts_or_observations_included": false
+    }
+  },
+  "limitations": [
+    "The prior match is telemetry-based, not an explicit trial-selection manifest.",
+    "The old instruction disclosed the exact answer; all audited cards saw it.",
+    "5 cards rely on cached web-fetch content. Cached responses may arrive after an initial result write; cached_after_first_result_write records ordering only when a result write was detected, and null means no write was detected.",
+    "No new live WebBook query was made during this audit; page freshness at run time is not established.",
+    "A card with no observed response is unverified when the saved answer matches, and unsupported when it does not; unsupported is therefore an answer mismatch, not proof that no retrieval occurred.",
+    "No raw traces, prompts, trial/job identifiers, host names, or private paths are included; no agent was rerun."
+  ],
+  "reproduce": {
+    "command": "python3 scripts/atomisticskills/historical_nist_audit.py --audit-dir <prior-audit-dir> --remote <archive-host> --jobs-root <jobs-root> --out docs/issue-1/nist.json",
+    "local_command": "python3 scripts/atomisticskills/historical_nist_audit.py --audit-dir <prior-audit-dir> --jobs-root <jobs-dir> --out docs/issue-1/nist.json"
+  }
+}

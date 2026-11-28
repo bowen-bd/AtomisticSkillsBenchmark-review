@@ -21,6 +21,7 @@ import datetime
 import glob
 import html
 import json
+import math
 import os
 import re
 import shutil
@@ -39,15 +40,38 @@ except ImportError:
 
 from task_versions import ran_on_shipped_version
 
-# Selected trials whose recorded task checksum is not the shipped task version
-# (see task_versions.py). They are still shown; the build reports how many.
-OTHER_VERSION: dict[str, str] = {}  # trial dir -> model
+# A trial is "current" only when it ran on the shipped task revision, recorded no
+# infrastructure exception, and produced a verifier reward. Current metrics count
+# exactly those. Everything else is archived and, when --archive is given, shown
+# on a separate historical page -- never folded into a current pass rate.
+CURRENT = "current"
+OFF_VERSION = "off-version"
+INFRA = "infrastructure"
+NO_REWARD = "no-reward"
+
+ARCHIVE_REASONS = {
+    OFF_VERSION: "Superseded task revision",
+    INFRA: "Infrastructure error (agent, verifier or timeout)",
+    NO_REWARD: "No verifier reward recorded",
+}
+
+# Set by main() when --archive/--historical is requested. The link is emitted only
+# when the page actually exists.
+ARCHIVE_ENABLED = False
+
+CURRENT_ONLY_NOTE = (
+    "Current results only: these figures count trials that ran on the shipped task "
+    "revision and produced a verifier reward. Infrastructure errors (including agent "
+    "and verifier timeouts) and runs without a reward are excluded, not counted as "
+    "failures."
+)
 
 DEFAULT_JOBS = ["jobs"]
 DEFAULT_OUT_DIR = "site"
 # Navbar "GitHub" link; override with --repo-url.
 REPO_URL = "https://github.com/learningmatter-mit/AtomisticSkillsBenchmark"
 SITE_ASSETS = os.path.join(_script_dir, "site_assets")
+BENCHMARK_VERSION = "v" + (Path(__file__).resolve().parents[2] / "VERSION").read_text(encoding="utf-8").strip()
 
 # "pass" (the nav badge) and the order of this list are recomputed from the trials
 # on every build: descending no-skills pass rate, the rank key of the leaderboard.
@@ -175,31 +199,49 @@ def fmt_cost_one(v) -> str:
     return "n/a" if v is None else f"${v:.4f}"
 
 
-def collect_trials(jobs_dirs: list[str], repo_root: str, model_filter: str | None = None, max_per_mode: int = 3) -> tuple[dict, int]:
-    """Collect trial data aggregated by task for the 30 core AtomisticSkills tasks."""
-    raw_by_task = {}
+def _read_trial_result(trial_dir: str) -> dict:
+    """Read a Harbor result.json, returning an empty object when absent or malformed.
+
+    Only classification fields are consulted here (exception_info, task_checksum,
+    agent_info). Raw verifier logs and answer files are never read.
+    """
+    try:
+        with open(os.path.join(trial_dir, "result.json"), "r", encoding="utf-8", errors="replace") as f:
+            data = json.load(f)
+    except Exception:
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def collect_trial_records(jobs_dirs: list[str], repo_root: str,
+                          model_filter: str | None = None) -> list[dict]:
+    """Every finished solver trial found under the jobs directories.
+
+    Each record carries an `exclusion` reason: None for a current trial, otherwise
+    one of OFF_VERSION, INFRA or NO_REWARD. A trial with no reward is never treated
+    as a scored failure. Infrastructure classification deliberately mirrors
+    pass_rates.crashed_trial: any truthy result.json `exception_info`, which covers
+    verifier errors, non-zero agent exits and AgentTimeoutError alike.
+    """
+    records = []
 
     for jd in jobs_dirs:
         if not os.path.exists(jd):
             continue
         for cfg_path in glob.glob(os.path.join(jd, "**", "config.json"), recursive=True):
             tdir = os.path.dirname(cfg_path)
-            reward_file = os.path.join(tdir, "verifier", "reward.txt")
-            if not os.path.exists(reward_file):
-                continue
             try:
                 with open(cfg_path, "r", encoding="utf-8") as f:
                     conf = json.load(f)
-                with open(reward_file, "r", encoding="utf-8") as f:
-                    reward = float(f.read().strip())
             except Exception:
+                continue
+            if not isinstance(conf, dict):
                 continue
 
             path = (conf.get("task") or {}).get("path") or ""
             path = path.replace("tasks/atomisticskills/", "tasks/")
             if not path.startswith("tasks/"):
                 continue
-
             if not os.path.exists(os.path.join(repo_root, path, "task.toml")):
                 continue
 
@@ -212,33 +254,55 @@ def collect_trials(jobs_dirs: list[str], repo_root: str, model_filter: str | Non
             if model_filter and model_name != model_filter:
                 continue
 
-            trial_mtime = os.path.getmtime(reward_file)
+            result = _read_trial_result(tdir)
+            crashed = bool(result.get("exception_info"))
+            checksum = result.get("task_checksum")
+            on_shipped_version = ran_on_shipped_version(
+                path.rstrip("/").split("/")[-1], os.path.join(repo_root, path), checksum)
+
+            reward_file = os.path.join(tdir, "verifier", "reward.txt")
+            reward = None
+            if os.path.exists(reward_file):
+                try:
+                    with open(reward_file, "r", encoding="utf-8") as f:
+                        reward = float(f.read().strip())
+                except (OSError, ValueError):
+                    reward = None
+                if reward is not None and not math.isfinite(reward):
+                    reward = None
+
+            # Crash first (matches pass_rates), then task revision, then reward.
+            if crashed:
+                exclusion = INFRA
+            elif not on_shipped_version:
+                exclusion = OFF_VERSION
+            elif reward is None:
+                exclusion = NO_REWARD
+            else:
+                exclusion = None
+
+            # A crashed/infra trial's leftover reward.txt is not a capability signal.
+            passed = None if exclusion == INFRA or reward is None else reward >= 1.0
+
             parts = path.rstrip("/").split("/")
             task_slug = parts[-1]
             field = parts[-2] if len(parts) >= 2 else "general"
             agent_skills = agent_info.get("skills") or []
             has_skills = bool(agent_skills) or ("AtomisticSkills" in json.dumps(conf))
 
-            passed = reward >= 1.0
-            trial_id = os.path.basename(tdir)
+            try:
+                trial_mtime = os.path.getmtime(reward_file if os.path.exists(reward_file) else cfg_path)
+            except OSError:
+                trial_mtime = 0.0
 
-            crashed = False
-            checksum = None
-            result_json_path = os.path.join(tdir, "result.json")
-            if os.path.exists(result_json_path):
-                try:
-                    with open(result_json_path, "r", encoding="utf-8", errors="replace") as rf:
-                        r_data = json.load(rf)
-                        crashed = bool(r_data.get("exception_info"))
-                        checksum = r_data.get("task_checksum")
-                except Exception:
-                    pass
-
-            on_shipped_version = ran_on_shipped_version(task_slug, os.path.join(repo_root, path), checksum)
-
-            trial_record = {
-                "trial_id": trial_id,
+            records.append({
+                "trial_id": os.path.basename(tdir),
                 "trial_dir": tdir,
+                "task": task_slug,
+                "task_path": path,
+                "field": field,
+                "scope": CURRENT if exclusion is None else "archive",
+                "exclusion": exclusion,
                 "on_shipped_version": on_shipped_version,
                 "model": model_name,
                 "agent": agent_name,
@@ -248,41 +312,50 @@ def collect_trials(jobs_dirs: list[str], repo_root: str, model_filter: str | Non
                 "crashed": crashed,
                 "mtime": trial_mtime,
                 **trial_telemetry(tdir, model_name=model_name),
+            })
+
+    return records
+
+
+def collect_trials(jobs_dirs: list[str], repo_root: str, model_filter: str | None = None,
+                   max_per_mode: int = 3) -> tuple[dict, int]:
+    """Collect CURRENT trial data aggregated by task for the core AtomisticSkills tasks.
+
+    Archived trials -- an earlier task revision, an infrastructure exception, or no
+    verifier reward -- never reach this aggregate. Eligibility is applied before the
+    top-k selection, so an excluded record cannot consume a model's k slots.
+    """
+    raw_by_task = {}
+
+    for record in collect_trial_records(jobs_dirs, repo_root, model_filter=model_filter):
+        if record["exclusion"] is not None:
+            continue
+        slug = record["task"]
+        if slug not in raw_by_task:
+            raw_by_task[slug] = {
+                "slug": slug,
+                "field": record["field"],
+                "task_path": record["task_path"],
+                "instruction": get_task_instruction(record["task_path"], repo_root),
+                "metadata": get_task_metadata(record["task_path"], repo_root),
+                "with": [],
+                "no": [],
             }
-
-            if task_slug not in raw_by_task:
-                raw_by_task[task_slug] = {
-                    "slug": task_slug,
-                    "field": field,
-                    "task_path": path,
-                    "instruction": get_task_instruction(path, repo_root),
-                    "metadata": get_task_metadata(path, repo_root),
-                    "with": [],
-                    "no": [],
-                }
-
-            if has_skills:
-                raw_by_task[task_slug]["with"].append(trial_record)
-            else:
-                raw_by_task[task_slug]["no"].append(trial_record)
+        raw_by_task[slug]["with" if record["has_skills"] else "no"].append(record)
 
     tasks_data = {}
     dropped_outdated_count = 0
 
     for slug, t_raw in raw_by_task.items():
-        # Newest non-crashed trials first. Never rank by outcome: preferring passes
-        # whenever more than max_per_mode trials exist would inflate pass rates.
-        sorted_with = sorted(t_raw["with"], key=lambda r: (not r.get("crashed", False), r["mtime"]), reverse=True)
-        sorted_no = sorted(t_raw["no"], key=lambda r: (not r.get("crashed", False), r["mtime"]), reverse=True)
+        # Newest first. Never rank by outcome: preferring passes whenever more than
+        # max_per_mode trials exist would inflate pass rates.
+        sorted_with = sorted(t_raw["with"], key=lambda r: r["mtime"], reverse=True)
+        sorted_no = sorted(t_raw["no"], key=lambda r: r["mtime"], reverse=True)
 
         selected_with = sorted_with[:max_per_mode]
         selected_no = sorted_no[:max_per_mode]
 
         dropped_outdated_count += (len(sorted_with) - len(selected_with)) + (len(sorted_no) - len(selected_no))
-        selected_trials = selected_with + selected_no
-        for r in selected_trials:
-            if not r["on_shipped_version"]:
-                OTHER_VERSION[r["trial_dir"]] = r["model"]
 
         tasks_data[slug] = {
             "slug": slug,
@@ -290,10 +363,37 @@ def collect_trials(jobs_dirs: list[str], repo_root: str, model_filter: str | Non
             "task_path": t_raw["task_path"],
             "instruction": t_raw["instruction"],
             "metadata": t_raw["metadata"],
-            "trials": selected_trials,
+            "trials": selected_with + selected_no,
         }
 
     return tasks_data, dropped_outdated_count
+
+
+def collect_archive_records(jobs_dirs: list[str], repo_root: str,
+                            model_filter: str | None = None) -> list[dict]:
+    """Trials excluded from current metrics, newest first, with their exclusion reason.
+
+    These are display-only historical records and are never aggregate inputs. A
+    no-reward record has `passed` None and `reward` None; an infrastructure record
+    has `passed` None even if a stale reward.txt survived. Neither is a synthetic 0.
+    """
+    records = [r for r in collect_trial_records(jobs_dirs, repo_root, model_filter=model_filter)
+               if r["exclusion"] is not None]
+    return sorted(records, key=lambda r: r["mtime"], reverse=True)
+
+
+def current_scored_trials(trials: list[dict]) -> list[dict]:
+    """Only trials that may contribute to a current pass rate.
+
+    Defensive at the rendering layer: even if a caller hands over archived records,
+    an infrastructure error, off-revision run or missing reward is never counted as
+    a failure.
+    """
+    return [tr for tr in trials
+            if tr.get("passed") is not None
+            and not tr.get("crashed")
+            and tr.get("on_shipped_version")
+            and tr.get("exclusion") is None]
 
 
 def generate_css() -> str:
@@ -1581,6 +1681,7 @@ def render_navbar(active_page: str, depth: int) -> str:
     tasks_href = root + "tasks.html"
     is_lb_active = (active_page == "leaderboard")
     is_tasks_active = (active_page == "tasks")
+    is_archive_active = (active_page == "archive")
 
     active_model_label = None
     for m in SITE_MODELS:
@@ -1613,10 +1714,18 @@ def render_navbar(active_page: str, depth: int) -> str:
           </a>
         """)
 
+    archive_tab = ""
+    if ARCHIVE_ENABLED:
+        archive_tab = (
+            f'<a class="model-tab{" active" if is_archive_active else ""}" '
+            f'href="{html.escape(root + "archive/index.html")}">🗄️ Archive</a>'
+        )
+
     tabs_html = f"""
     <div class="model-tabs">
       <a class="model-tab{' active' if is_lb_active else ''}" href="{html.escape(leaderboard_href)}">🏆 Leaderboard</a>
       <a class="model-tab{' active' if is_tasks_active else ''}" href="{html.escape(tasks_href)}">📋 Task Catalog</a>
+      {archive_tab}
       <div class="models-dropdown">
         <button class="model-tab models-dropdown-trigger{trigger_active}" type="button">
           <span>{html.escape(trigger_text)}</span>
@@ -1651,6 +1760,183 @@ def render_navbar(active_page: str, depth: int) -> str:
     """
 
 
+def render_archive_page(records: list[dict], out_path: str) -> None:
+    """Render the separate historical page for trials excluded from current metrics.
+
+    This page is deliberately not a leaderboard: it lists individual archived trials
+    with the reason each one is excluded. It never computes a pass rate and never
+    labels an archived record as a current result.
+    """
+    depth = 1
+    navbar_html = render_navbar("archive", depth)
+    now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    # Defensive: this page is only for excluded records. A current record handed
+    # in by mistake must never be presented here as an archived result.
+    records = [r for r in records if r.get("exclusion") is not None]
+
+    reasons = {OFF_VERSION: 0, INFRA: 0, NO_REWARD: 0}
+    for record in records:
+        if record.get("exclusion") in reasons:
+            reasons[record["exclusion"]] += 1
+
+    field_order = {"chemistry": 0, "materials-science": 1, "drug-discovery": 2, "machine-learning": 3}
+    ordered = sorted(records, key=lambda r: (field_order.get(r.get("field"), 9),
+                                             r.get("task", ""), r.get("model", ""),
+                                             -(r.get("mtime") or 0)))
+
+    rows = []
+    for record in ordered:
+        field = record.get("field", "general")
+        badge_class = f"badge-{field}" if f"badge-{field}" in [
+            "badge-chemistry", "badge-materials-science",
+            "badge-drug-discovery", "badge-machine-learning"] else "badge-field"
+        mode_badge = ('<span class="badge badge-skill">With Skills</span>'
+                      if record.get("has_skills")
+                      else '<span class="badge" style="background:#f1f5f9;color:#64748b;'
+                           'border:1px solid #e2e8f0;">No Skills</span>')
+        if record.get("exclusion") == OFF_VERSION and record.get("reward") is not None:
+            reward_html = (f'<strong>{record["reward"]:.2f}</strong>'
+                           '<div style="font-size:0.72rem;color:var(--muted);">recorded on old revision</div>')
+        else:
+            reward_html = ('<span class="badge" style="background:#fff7ed;color:#9a3412;'
+                           'border:1px solid #fed7aa;">not scored</span>')
+        try:
+            recorded = datetime.datetime.fromtimestamp(record["mtime"]).strftime("%Y-%m-%d")
+        except (KeyError, OSError, OverflowError, TypeError, ValueError):
+            recorded = "—"
+        reason = ARCHIVE_REASONS.get(record.get("exclusion"), record.get("exclusion") or "Archived")
+        rows.append(f"""
+        <tr>
+          <td><span class="badge {badge_class}">{html.escape(field)}</span></td>
+          <td>
+            <strong>{html.escape(record.get("task", "?"))}</strong>
+            <div style="font-size:0.72rem;color:var(--muted);">{html.escape(record.get("agent", "?"))}</div>
+          </td>
+          <td>{html.escape(record.get("model", "?"))}</td>
+          <td>{mode_badge}</td>
+          <td style="font-family:'JetBrains Mono',monospace;">{recorded}</td>
+          <td style="font-family:'JetBrains Mono',monospace;">{reward_html}</td>
+          <td><span style="color:#9a3412;font-weight:600;">{html.escape(str(reason))}</span></td>
+        </tr>
+        """)
+
+    if not rows:
+        rows.append("""
+        <tr>
+          <td colspan="7" style="text-align:center; color:var(--muted); padding:36px 18px;">
+            No archived records were found in the supplied jobs directories.
+          </td>
+        </tr>
+        """)
+
+    html_content = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <title>Historical Archive (not current) — AtomisticSkills Benchmark</title>
+  <style>{generate_css()}</style>
+</head>
+<body>
+  {navbar_html}
+
+  <div role="alert" style="background:#7f1d1d; color:#ffffff; padding:16px 20px; text-align:center;
+       font-weight:900; letter-spacing:0.08em; font-size:0.95rem; text-transform:uppercase;">
+    ⚠ Historical archive — not current benchmark results
+  </div>
+
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="nav-breadcrumbs" style="text-align:center; margin-bottom:12px;">
+        <a href="../index.html">&larr; Current leaderboard</a> / <span>Historical archive</span>
+      </div>
+      <div class="hero-badge" style="background:#fee2e2; color:#991b1b; border-color:#fecaca;">
+        <span class="dot" style="background:#991b1b;"></span> ARCHIVE / EXCLUDED RECORDS
+      </div>
+      <h1 class="hero-title-text" style="margin-bottom:0.5rem;">Historical Archive of Excluded Trials</h1>
+      <p class="hero-subtitle" style="max-width:900px; margin:0 auto 24px auto;">
+        This page shows trials that are <strong>not part of the current leaderboard</strong>:
+        runs on superseded task revisions, runs with an agent, verifier or timeout
+        infrastructure error, and runs that produced no verifier reward. Archived
+        records are listed individually and never contribute to a current pass rate.
+      </p>
+
+      <div class="metrics-strip" style="max-width:960px; margin:0 auto;">
+        <div class="metric-item">
+          <div class="metric-num">{len(records)}</div>
+          <div class="metric-desc">ARCHIVED TRIALS</div>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric-item">
+          <div class="metric-num">{reasons[OFF_VERSION]}</div>
+          <div class="metric-desc">SUPERSEDED REVISION</div>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric-item">
+          <div class="metric-num">{reasons[INFRA]}</div>
+          <div class="metric-desc">INFRASTRUCTURE ERROR</div>
+        </div>
+        <div class="metric-divider"></div>
+        <div class="metric-item">
+          <div class="metric-num">{reasons[NO_REWARD]}</div>
+          <div class="metric-desc">NO REWARD</div>
+        </div>
+      </div>
+      <div class="metrics-note" style="max-width:960px; margin:18px auto 0 auto; color:#991b1b;">
+        Nothing on this page is a current result. A missing reward or infrastructure
+        failure is shown as “not scored”, never as a score of 0.
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <div class="card">
+      <div class="card-title" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+        <span>🗄️ Archived Trial Records (display only)</span>
+        <span style="font-size:0.82rem; font-weight:normal; color:var(--muted);">
+          {len(records)} records &bull; not used in any current metric
+        </span>
+      </div>
+      <div style="overflow-x:auto; margin-top:16px;">
+        <table>
+          <thead>
+            <tr>
+              <th>Discipline</th>
+              <th>Task</th>
+              <th>Model</th>
+              <th>Mode</th>
+              <th>Trial date</th>
+              <th>Recorded reward</th>
+              <th>Why excluded</th>
+            </tr>
+          </thead>
+          <tbody>
+            {''.join(rows)}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>AtomisticSkills Benchmark &bull; Historical archive, generated on {now_str} &bull;
+      <a href="../index.html" style="color:var(--accent); text-decoration:none;">Back to current leaderboard</a></p>
+  </footer>
+</body>
+</html>
+"""
+    parent = os.path.dirname(out_path)
+    if parent:
+        os.makedirs(parent, exist_ok=True)
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write(html_content)
+
+
 def collect_all_models_summary(jobs_dirs: list[str], repo_root: str) -> list[dict]:
     """Collect detailed benchmark statistics for all SITE_MODELS for the leaderboard."""
     summary = []
@@ -1673,7 +1959,7 @@ def collect_all_models_summary(jobs_dirs: list[str], repo_root: str) -> list[dic
         agents = set()
 
         for t in core_data.values():
-            for tr in t["trials"]:
+            for tr in current_scored_trials(t["trials"]):
                 agents.add(tr.get("agent", "?"))
                 sec = tr.get("agent_sec")
                 out_t = tr.get("out_tok")
@@ -1753,31 +2039,61 @@ def render_leaderboard_page(leaderboard: list[dict], out_path: str) -> None:
     logo_src = "logo/atomisticskills_logo.svg"
     now_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # Ranked by the no-skills pass rate: that is the model's own capability on the
-    # task, before any skill is mounted. Ties break on the lift a skill then adds.
-    sorted_lb = sorted(leaderboard, key=lambda x: (x["ns_rate"], x["boost"]), reverse=True)
+    # Missing no-skills coverage is not a zero score or a rank. Use skill lift
+    # as a tie-break only when both modes were observed.
+    scored_models = [row for row in leaderboard if row["ws_t"] or row["ns_t"]]
+    sorted_lb = sorted(scored_models, key=lambda x: (
+        bool(x["ns_t"]), x["ns_rate"], x["boost"] if x["ws_t"] else -math.inf), reverse=True)
 
     rows = []
     cards = []
 
-    headline = [e for e in leaderboard if e["model"] not in HEADLINE_EXCLUDE] or leaderboard
-    excluded = [e["label"] for e in leaderboard if e["model"] in HEADLINE_EXCLUDE]
+    headline = [e for e in scored_models if e["model"] not in HEADLINE_EXCLUDE] or scored_models
+    excluded = [e["label"] for e in scored_models if e not in headline]
     excluded_clause = f", excluding {html.escape(', '.join(excluded))}" if excluded else ""
     metrics_note_html = (
         f'<div class="metrics-note">Pass-rate averages and peak boost span {len(headline)} of the '
         f'{len(leaderboard)} models{excluded_clause}; the leaderboard below lists every model.</div>'
         if excluded else ""
     )
+    archive_note = (
+        ' <a href="archive/index.html" style="color:var(--accent); font-weight:700;">'
+        'Historical archive of excluded records &rarr;</a>'
+        if ARCHIVE_ENABLED else ""
+    )
+    metrics_note_html += f'<div class="metrics-note">{CURRENT_ONLY_NOTE}{archive_note}</div>'
+    if not scored_models:
+        metrics_note_html += '<div class="metrics-note">No scored trials on the current revisions yet.</div>'
     # Mean of the per-model rates, not of the pooled trials: k differs between
     # models (Luna runs k=3) and pooling would weight it three times as heavily.
-    avg_ws = sum(e["ws_rate"] for e in headline) / len(headline)
-    avg_ns = sum(e["ns_rate"] for e in headline) / len(headline)
-    best_boost_entry = max(headline, key=lambda e: e["boost"])
-    best_boost = best_boost_entry["boost"]
+    # A model with no current trials has no rate to average; it must not drag the
+    # headline down to a synthetic 0%.
+    ws_models = [e for e in headline if e["ws_t"]]
+    ns_models = [e for e in headline if e["ns_t"]]
+    avg_ws = sum(e["ws_rate"] for e in ws_models) / len(ws_models) if ws_models else None
+    avg_ns = sum(e["ns_rate"] for e in ns_models) / len(ns_models) if ns_models else None
+    boost_models = [e for e in headline if e["ws_t"] and e["ns_t"]]
+    best_boost_entry = max(boost_models, key=lambda e: e["boost"]) if boost_models else None
+    best_boost = best_boost_entry["boost"] if best_boost_entry else None
     tot_all_cost = sum((e["tot_cost"] for e in leaderboard if e["tot_cost"] is not None), 0.0)
     tot_evaluated_trials = sum((e["ws_t"] + e["ns_t"] for e in leaderboard))
-    tasks_count = max((e.get("tasks_count", 0) for e in leaderboard), default=31)
-    models_count = len(leaderboard)
+    tasks_count = max((e.get("tasks_count", 0) for e in leaderboard), default=0)
+    models_count = len(scored_models)
+
+    avg_ws_str = f"{avg_ws:.1f}%" if avg_ws is not None else "—"
+    avg_ns_str = f"{avg_ns:.1f}%" if avg_ns is not None else "—"
+    best_boost_str = f"{best_boost:+.1f}%" if best_boost is not None else "—"
+    if best_boost_entry is not None:
+        boost_tooltip = (
+            f"Largest absolute pass rate improvement from mounting domain skills "
+            f"({best_boost:+.1f}% by {html.escape(best_boost_entry['label'])}), "
+            f"across {len(headline)} models{excluded_clause}."
+        )
+    else:
+        boost_tooltip = (
+            "No model has both a current no-skills and with-skills pass rate yet, "
+            f"so no skill boost is published across the {len(headline)} models{excluded_clause}."
+        )
 
     for rank, entry in enumerate(sorted_lb, 1):
         target = f'{entry["subdir"]}/index.html'
@@ -1787,8 +2103,12 @@ def render_leaderboard_page(leaderboard: list[dict], out_path: str) -> None:
         ns_str = f'<strong>{entry["ns_rate"]:.1f}%</strong><span class="sub-stat rate-sub">({entry["ns_p"]}/{entry["ns_t"]})</span>' if entry["ns_t"] else "—"
 
         boost_val = entry["boost"]
+        has_boost = bool(entry["ws_t"] and entry["ns_t"])
         boost_cls = "badge-pass" if boost_val > 0 else ("badge-fail" if boost_val < 0 else "badge-field")
-        boost_str = f'<span class="badge {boost_cls}">{boost_val:+.1f}%</span>'
+        boost_str = f'<span class="badge {boost_cls}">{boost_val:+.1f}%</span>' if has_boost else "—"
+        ns_card_str = f"{entry['ns_rate']:.1f}%" if entry["ns_t"] else "—"
+        ws_card_str = f"{entry['ws_rate']:.1f}%" if entry["ws_t"] else "—"
+        boost_card_str = f"{boost_val:+.1f}%" if has_boost else "—"
 
         ws_time_str = fmt_sec(entry["mean_ws_time"])
         ns_time_str = fmt_sec(entry["mean_ns_time"])
@@ -1811,14 +2131,19 @@ def render_leaderboard_page(leaderboard: list[dict], out_path: str) -> None:
         runs_count = entry["ws_t"] + entry["ns_t"]
         cost_str = f'${entry["tot_cost"]:.2f}' if entry["tot_cost"] is not None else "n/a"
 
-        rank_badge = f'<span class="rank-badge rank-{rank}">{rank}</span>' if rank <= 3 else f'<span class="rank-badge">{rank}</span>'
+        if not entry["ns_t"]:
+            rank_badge = '<span class="rank-badge" title="No current no-skills trials">—</span>'
+        elif rank <= 3:
+            rank_badge = f'<span class="rank-badge rank-{rank}">{rank}</span>'
+        else:
+            rank_badge = f'<span class="rank-badge">{rank}</span>'
 
         rows.append(f"""
         <tr>
           <td style="text-align:center;">{rank_badge}</td>
           <td>
             <a class="model-link" href="{html.escape(target)}"><strong>{html.escape(entry['label'])}</strong></a>
-            <div style="font-size:0.75rem; color:var(--muted);">k={k_val} ({runs_count} runs)</div>
+            <div style="font-size:0.75rem; color:var(--muted);">{entry['tasks_count']} tasks &bull; k={k_val} ({runs_count} runs)</div>
           </td>
           <td>{agent_badges}</td>
           <td>{ns_str}</td>
@@ -1847,15 +2172,15 @@ def render_leaderboard_page(leaderboard: list[dict], out_path: str) -> None:
             </div>
             <div class="model-card-stats">
               <div class="stat-box">
-                <div class="stat-val">{entry['ns_rate']:.1f}%</div>
+                <div class="stat-val">{ns_card_str}</div>
                 <div class="stat-lbl">No Skills ({entry['ns_p']}/{entry['ns_t']})</div>
               </div>
               <div class="stat-box">
-                <div class="stat-val" style="color:#16a34a;">{entry['ws_rate']:.1f}%</div>
+                <div class="stat-val" style="color:#16a34a;">{ws_card_str}</div>
                 <div class="stat-lbl">With Skills ({entry['ws_p']}/{entry['ws_t']})</div>
               </div>
               <div class="stat-box">
-                <div class="stat-val" style="color:#816cff;">{boost_val:+.1f}%</div>
+                <div class="stat-val" style="color:#816cff;">{boost_card_str}</div>
                 <div class="stat-lbl">Skill Boost &Delta;</div>
               </div>
               <div class="stat-box">
@@ -1886,7 +2211,7 @@ def render_leaderboard_page(leaderboard: list[dict], out_path: str) -> None:
 
   <div class="hero">
     <div class="hero-inner">
-      <div class="hero-badge"><span class="dot"></span> CROSS-MODEL BENCHMARK LEADERBOARD</div>
+      <div class="hero-badge"><span class="dot"></span> CROSS-MODEL BENCHMARK LEADERBOARD · {html.escape(BENCHMARK_VERSION)}</div>
       
       <div class="hero-title-container">
         <img class="hero-title-logo" src="{html.escape(logo_src)}" alt="AtomisticSkills" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
@@ -1912,21 +2237,21 @@ def render_leaderboard_page(leaderboard: list[dict], out_path: str) -> None:
         </div>
         <div class="metric-divider"></div>
         <div class="metric-item tooltip-trigger">
-          <div class="metric-num">{avg_ns:.1f}%</div>
+          <div class="metric-num">{avg_ns_str}</div>
           <div class="metric-desc">AVG NO-SKILL PASS</div>
-          <div class="tooltip-box">Mean of the per-model no-skills pass rates across {len(headline)} models{excluded_clause}. Averaged per model rather than per trial, so a model sampled at k=3 does not count three times.</div>
+          <div class="tooltip-box">Mean of the per-model no-skills pass rates across models with current no-skills trials{excluded_clause}. Averaged per model rather than per trial, so a model sampled at k=3 does not count three times.</div>
         </div>
         <div class="metric-divider"></div>
         <div class="metric-item tooltip-trigger">
-          <div class="metric-num green">{avg_ws:.1f}%</div>
+          <div class="metric-num green">{avg_ws_str}</div>
           <div class="metric-desc">AVG WITH-SKILL PASS</div>
-          <div class="tooltip-box">Mean of the per-model with-skills pass rates across {len(headline)} models{excluded_clause}. Averaged per model rather than per trial, so a model sampled at k=3 does not count three times.</div>
+          <div class="tooltip-box">Mean of the per-model with-skills pass rates across models with current with-skills trials{excluded_clause}. Averaged per model rather than per trial, so a model sampled at k=3 does not count three times.</div>
         </div>
         <div class="metric-divider"></div>
         <div class="metric-item tooltip-trigger">
-          <div class="metric-num purple">+{best_boost:.1f}%</div>
+          <div class="metric-num purple">{best_boost_str}</div>
           <div class="metric-desc">PEAK SKILL BOOST &Delta;</div>
-          <div class="tooltip-box">Largest absolute pass rate improvement from mounting domain skills (+{best_boost:.1f}% by {html.escape(best_boost_entry["label"])}), across {len(headline)} models{excluded_clause}.</div>
+          <div class="tooltip-box">{boost_tooltip}</div>
         </div>
         <div class="metric-divider"></div>
         <div class="metric-item tooltip-trigger">
@@ -2079,17 +2404,18 @@ def render_task_catalog_page(jobs_dirs: list[str], repo_root: str, out_path: str
                     "per_model": {},
                 }
 
-            ws_p = sum(1 for tr in t["trials"] if tr["has_skills"] and tr["passed"])
-            ws_t = sum(1 for tr in t["trials"] if tr["has_skills"])
-            ns_p = sum(1 for tr in t["trials"] if not tr["has_skills"] and tr["passed"])
-            ns_t = sum(1 for tr in t["trials"] if not tr["has_skills"])
+            scored = current_scored_trials(t["trials"])
+            ws_p = sum(1 for tr in scored if tr["has_skills"] and tr["passed"])
+            ws_t = sum(1 for tr in scored if tr["has_skills"])
+            ns_p = sum(1 for tr in scored if not tr["has_skills"] and tr["passed"])
+            ns_t = sum(1 for tr in scored if not tr["has_skills"])
 
             task_stats[slug]["ws_passed"] += ws_p
             task_stats[slug]["ws_total"] += ws_t
             task_stats[slug]["ns_passed"] += ns_p
             task_stats[slug]["ns_total"] += ns_t
 
-            for tr in t["trials"]:
+            for tr in scored:
                 sec = tr.get("agent_sec")
                 tok = tr.get("out_tok")
                 cost = tr.get("cost_usd")
@@ -2113,9 +2439,16 @@ def render_task_catalog_page(jobs_dirs: list[str], repo_root: str, out_path: str
     tot_ns_p = sum(st["ns_passed"] for st in task_stats.values())
     tot_ns_t = sum(st["ns_total"] for st in task_stats.values())
 
-    avg_ws_rate = (tot_ws_p / tot_ws_t * 100) if tot_ws_t else 0.0
-    avg_ns_rate = (tot_ns_p / tot_ns_t * 100) if tot_ns_t else 0.0
-    overall_boost = avg_ws_rate - avg_ns_rate
+    avg_ws_rate = (tot_ws_p / tot_ws_t * 100) if tot_ws_t else None
+    avg_ns_rate = (tot_ns_p / tot_ns_t * 100) if tot_ns_t else None
+    overall_boost = (
+        avg_ws_rate - avg_ns_rate
+        if (avg_ws_rate is not None and avg_ns_rate is not None)
+        else None
+    )
+    avg_ws_str = f"{avg_ws_rate:.1f}%" if avg_ws_rate is not None else "—"
+    avg_ns_str = f"{avg_ns_rate:.1f}%" if avg_ns_rate is not None else "—"
+    overall_boost_str = f"{overall_boost:+.1f}%" if overall_boost is not None else "—"
 
     table_rows = []
     domain_order = {"chemistry": 0, "materials-science": 1, "drug-discovery": 2, "machine-learning": 3}
@@ -2136,13 +2469,22 @@ def render_task_catalog_page(jobs_dirs: list[str], repo_root: str, out_path: str
             "verifier_method": "Verifies ground-truth computational invariants in container.",
         })
 
-        ws_rate = (st["ws_passed"] / st["ws_total"] * 100) if st["ws_total"] else 0.0
-        ns_rate = (st["ns_passed"] / st["ns_total"] * 100) if st["ns_total"] else 0.0
-        boost = ws_rate - ns_rate
+        ws_has_data = st["ws_total"] > 0
+        ns_has_data = st["ns_total"] > 0
+        ws_rate = (st["ws_passed"] / st["ws_total"] * 100) if ws_has_data else None
+        ns_rate = (st["ns_passed"] / st["ns_total"] * 100) if ns_has_data else None
+        has_boost = bool(ws_has_data and ns_has_data)
+        boost = (ws_rate - ns_rate) if has_boost else None
 
-        ws_badge_cls = "pass" if ws_rate >= 80 else ("warn" if ws_rate >= 50 else "fail")
-        ns_badge_cls = "pass" if ns_rate >= 80 else ("warn" if ns_rate >= 50 else "fail")
-        boost_badge_cls = "green" if boost > 0 else ("red" if boost < 0 else "")
+        ws_badge_cls = ("pass" if ws_rate >= 80 else ("warn" if ws_rate >= 50 else "fail")) if ws_has_data else ""
+        ns_badge_cls = ("pass" if ns_rate >= 80 else ("warn" if ns_rate >= 50 else "fail")) if ns_has_data else ""
+        boost_badge_cls = ("green" if boost > 0 else ("red" if boost < 0 else "")) if has_boost else ""
+        ws_rate_str = f"{ws_rate:.1f}%" if ws_has_data else "—"
+        ns_rate_str = f"{ns_rate:.1f}%" if ns_has_data else "—"
+        boost_str = f"{boost:+.1f}%" if has_boost else "—"
+        ws_sort = f"{ws_rate:.2f}" if ws_has_data else "-1"
+        ns_sort = f"{ns_rate:.2f}" if ns_has_data else "-1"
+        boost_sort = f"{boost:.2f}" if has_boost else "-1"
 
         mean_ws_t = fmt_sec(_mean(st["ws_times"]))
         mean_ns_t = fmt_sec(_mean(st["ns_times"]))
@@ -2184,9 +2526,9 @@ def render_task_catalog_page(jobs_dirs: list[str], repo_root: str, out_path: str
             data-slug="{html.escape(slug)}"
             data-val-0="{html.escape(field)}"
             data-val-1="{html.escape(rubric['title'].lower())}"
-            data-val-2="{ws_rate:.2f}"
-            data-val-3="{ns_rate:.2f}"
-            data-val-4="{boost:.2f}"
+            data-val-2="{ws_sort}"
+            data-val-3="{ns_sort}"
+            data-val-4="{boost_sort}"
             data-val-5="{raw_mean_ws_t:.2f}"
             data-val-6="{raw_mean_ws_tok:.2f}"
             data-val-7="{cost_val:.4f}">
@@ -2205,15 +2547,15 @@ def render_task_catalog_page(jobs_dirs: list[str], repo_root: str, out_path: str
             </div>
           </td>
           <td>
-            <span class="rate-badge {ws_badge_cls}" style="font-size:0.88rem;">{ws_rate:.1f}%</span>
+            <span class="rate-badge {ws_badge_cls}" style="font-size:0.88rem;">{ws_rate_str}</span>
             <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">{st['ws_passed']}/{st['ws_total']} runs</div>
           </td>
           <td>
-            <span class="rate-badge {ns_badge_cls}" style="font-size:0.88rem;">{ns_rate:.1f}%</span>
+            <span class="rate-badge {ns_badge_cls}" style="font-size:0.88rem;">{ns_rate_str}</span>
             <div style="font-size:0.72rem; color:var(--muted); margin-top:2px;">{st['ns_passed']}/{st['ns_total']} runs</div>
           </td>
           <td>
-            <span class="boost-badge {boost_badge_cls}" style="font-size:0.88rem;">{boost:+.1f}%</span>
+            <span class="boost-badge {boost_badge_cls}" style="font-size:0.88rem;">{boost_str}</span>
           </td>
           <td style="font-family:'JetBrains Mono',monospace; font-size:0.82rem;">
             <div><span style="color:#16a34a; font-weight:700;">{mean_ws_t}</span> <span style="color:var(--muted);">ws</span></div>
@@ -2296,6 +2638,7 @@ def render_task_catalog_page(jobs_dirs: list[str], repo_root: str, out_path: str
       <p class="hero-subtitle" style="max-width:850px; margin:0 auto 24px auto;">
         Complete registry of {tot_tasks} computational laboratory research workflows across Chemistry, Materials Science, Drug Discovery, and Machine Learning with cross-model pass rates and ground-truth grading rubrics.
       </p>
+      <div class="metrics-note" style="max-width:850px; margin:0 auto 20px auto;">{CURRENT_ONLY_NOTE}</div>
 
       <div class="metrics-strip" style="max-width:960px; margin: 0 auto;">
         <div class="metric-item tooltip-trigger">
@@ -2305,21 +2648,21 @@ def render_task_catalog_page(jobs_dirs: list[str], repo_root: str, out_path: str
         </div>
         <div class="metric-divider"></div>
         <div class="metric-item tooltip-trigger">
-          <div class="metric-num green">{avg_ws_rate:.1f}%</div>
+          <div class="metric-num green">{avg_ws_str}</div>
           <div class="metric-desc">WITH-SKILLS PASS ({tot_ws_p}/{tot_ws_t})</div>
-          <div class="tooltip-box">Aggregated pass rate across all multi-model runs with AtomisticSkills procedural tools enabled.</div>
+          <div class="tooltip-box">Aggregated pass rate across all current multi-model runs with AtomisticSkills procedural tools enabled.</div>
         </div>
         <div class="metric-divider"></div>
         <div class="metric-item tooltip-trigger">
-          <div class="metric-num">{avg_ns_rate:.1f}%</div>
+          <div class="metric-num">{avg_ns_str}</div>
           <div class="metric-desc">NO-SKILLS BASELINE ({tot_ns_p}/{tot_ns_t})</div>
-          <div class="tooltip-box">Aggregated baseline pass rate across all models without procedural skills.</div>
+          <div class="tooltip-box">Aggregated baseline pass rate across all current model runs without procedural skills.</div>
         </div>
         <div class="metric-divider"></div>
         <div class="metric-item tooltip-trigger">
-          <div class="metric-num purple">{overall_boost:+.1f}%</div>
+          <div class="metric-num purple">{overall_boost_str}</div>
           <div class="metric-desc">OVERALL SKILL LIFT &Delta;</div>
-          <div class="tooltip-box">Average cross-model accuracy improvement enabled by procedural domain skills.</div>
+          <div class="tooltip-box">Average cross-model accuracy improvement enabled by procedural domain skills. Shown only when both current baselines exist.</div>
         </div>
       </div>
     </div>
@@ -2521,7 +2864,7 @@ def render_model_dashboard(tasks_data: dict, model_name: str, out_path: str) -> 
     all_costs = []
 
     for task_info in tasks_data.values():
-        for tr in task_info["trials"]:
+        for tr in current_scored_trials(task_info["trials"]):
             sec = tr.get("agent_sec")
             out_t = tr.get("out_tok")
             in_t = tr.get("in_tok")
@@ -2569,6 +2912,12 @@ def render_model_dashboard(tasks_data: dict, model_name: str, out_path: str) -> 
     ws_cache_str = f"{ws_cache_val:.1f}%" if ws_cache_val is not None else "—"
     ns_cache_str = f"{ns_cache_val:.1f}%" if ns_cache_val is not None else "—"
 
+    # A mode with no current trials has no pass rate. Show an em dash rather
+    # than publishing a synthetic 0% for missing data.
+    ws_rate_str = f"{ws_rate:.1f}%" if with_skill_total else "—"
+    ns_rate_str = f"{ns_rate:.1f}%" if no_skill_total else "—"
+    boost_header_str = f"{boost:+.1f}%" if (with_skill_total and no_skill_total) else "—"
+
     cost_val_str = f"${sum(all_costs):.2f}" if all_costs else ("$0.00" if "qwen" in model_name else "n/a")
     tot_eval_runs = with_skill_total + no_skill_total
 
@@ -2579,8 +2928,9 @@ def render_model_dashboard(tasks_data: dict, model_name: str, out_path: str) -> 
 
     table_rows = []
     for slug, t in sorted(tasks_data.items(), key=lambda x: (x[1]["field"], x[0])):
-        ws_trials = [r for r in t["trials"] if r["has_skills"]]
-        ns_trials = [r for r in t["trials"] if not r["has_skills"]]
+        scored = current_scored_trials(t["trials"])
+        ws_trials = [r for r in scored if r["has_skills"]]
+        ns_trials = [r for r in scored if not r["has_skills"]]
 
         ws_p = sum(1 for r in ws_trials if r["passed"])
         ws_t = len(ws_trials)
@@ -2668,6 +3018,7 @@ def render_model_dashboard(tasks_data: dict, model_name: str, out_path: str) -> 
         Evaluating agent task completion, skill acceleration, latency, and token economics on {len(tasks_data)} benchmark tasks.<br />
         Model: <code>{html.escape(model_name)}</code> &bull; Sampling: <strong>k={k_val} ({tot_eval_runs} runs total)</strong>
       </p>
+      <div class="metrics-note" style="max-width:900px; margin:0 auto 18px auto;">{CURRENT_ONLY_NOTE}</div>
 
       <!-- SYMMETRIC 2-ROW COMPARISON + DEDICATED SIDE SUMMARY CARD -->
       <div class="metrics-comparison-container">
@@ -2679,7 +3030,7 @@ def render_model_dashboard(tasks_data: dict, model_name: str, out_path: str) -> 
               <span class="badge badge-skill" style="font-size:0.82rem; padding:4px 12px;">🌟 With Skills</span>
             </div>
             <div class="metric-item tooltip-trigger">
-              <div class="metric-num green">{ws_rate:.1f}%</div>
+              <div class="metric-num green">{ws_rate_str}</div>
               <div class="metric-desc">PASS RATE ({with_skill_pass}/{with_skill_total})</div>
               <div class="tooltip-box">Pass rate achieved when the agent utilizes AtomisticSkills domain tools and workflows.</div>
             </div>
@@ -2709,7 +3060,7 @@ def render_model_dashboard(tasks_data: dict, model_name: str, out_path: str) -> 
               <span class="badge badge-field" style="font-size:0.82rem; padding:4px 12px;">⚖️ No Skills</span>
             </div>
             <div class="metric-item tooltip-trigger">
-              <div class="metric-num">{ns_rate:.1f}%</div>
+              <div class="metric-num">{ns_rate_str}</div>
               <div class="metric-desc">PASS RATE ({no_skill_pass}/{no_skill_total})</div>
               <div class="tooltip-box">Baseline pass rate achieved when the agent attempts tasks using only general coding tools without domain skills.</div>
             </div>
@@ -2737,7 +3088,7 @@ def render_model_dashboard(tasks_data: dict, model_name: str, out_path: str) -> 
         <!-- RIGHT: DEDICATED SUMMARY CARD (SKILL BOOST & TOTAL COST) -->
         <div class="metrics-side-card">
           <div class="tooltip-trigger" style="text-align:center;">
-            <div class="metric-num purple" style="font-size:1.6rem;">+{boost:.1f}%</div>
+            <div class="metric-num purple" style="font-size:1.6rem;">{boost_header_str}</div>
             <div class="metric-desc" style="color:var(--accent); font-weight:800;">SKILL BOOST &Delta;</div>
             <div class="tooltip-box">Absolute pass rate gain achieved over the no-skills baseline: (With-Skills Pass) - (No-Skills Pass).</div>
           </div>
@@ -2936,7 +3287,7 @@ def render_canonical_task_page(slug: str, field: str, instruction: str, all_mode
         m_label = m["label"]
         m_logo = "../" + m.get("logo", "logos/gemini.png")
 
-        trials = all_models_trials.get(m_name, [])
+        trials = current_scored_trials(all_models_trials.get(m_name, []))
         ws_trials = [r for r in trials if r["has_skills"]]
         ns_trials = [r for r in trials if not r["has_skills"]]
 
@@ -2994,7 +3345,10 @@ def render_canonical_task_page(slug: str, field: str, instruction: str, all_mode
         _known = [c for c in _costs if c is not None]
         cost_str = f"${sum(_known):.2f}" if _known else ("$0.00" if "qwen" in m_name else "n/a")
 
-        if ws_p > 0 and ns_p == 0:
+        if ws_t == 0 and ns_t == 0:
+            verdict_str = "No current trials"
+            verdict_cls = ""
+        elif ws_p > 0 and ns_p == 0:
             verdict_str = "Skill Assisted"
             verdict_cls = "green"
         elif ws_p > 0 and ns_p > 0:
@@ -3015,7 +3369,16 @@ def render_canonical_task_page(slug: str, field: str, instruction: str, all_mode
         all_trials = sorted(trials, key=lambda x: (not x["has_skills"], x["trial_id"]))
 
         for tr in all_trials:
-            status_badge = '<span class="badge badge-pass">PASSED (1.0)</span>' if tr["passed"] else '<span class="badge badge-fail">FAILED (0.0)</span>'
+            if tr.get("crashed") or tr.get("exclusion") == INFRA:
+                status_badge = ('<span class="badge badge-fail">INFRASTRUCTURE ERROR '
+                                '(not scored)</span>')
+            elif tr.get("passed") is True:
+                status_badge = '<span class="badge badge-pass">PASSED (1.0)</span>'
+            elif tr.get("passed") is False:
+                status_badge = '<span class="badge badge-fail">FAILED (0.0)</span>'
+            else:
+                status_badge = ('<span class="badge" style="background:#fff7ed;color:#9a3412;'
+                                'border:1px solid #fed7aa;">NOT SCORED</span>')
             mode_badge = '<span class="badge badge-skill">With Skills</span>' if tr["has_skills"] else '<span class="badge" style="background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;">No Skills</span>'
 
             trials_rendered.append(
@@ -3262,7 +3625,7 @@ def build_for_model(model_name: str, jobs: list[str], repo_root: str, base_out_d
     tasks_data, dropped_count = collect_trials(jobs, repo_root, model_filter=model_name, max_per_mode=max_per_mode)
 
     if dropped_count > 0:
-        print(f"Excluded {dropped_count} outdated solver trials beyond top {max_per_mode} per mode.")
+        print(f"Excluded {dropped_count} current solver trials beyond top {max_per_mode} per mode.")
 
     if not tasks_data:
         print(f"WARNING: No trials found for model '{model_name}'. Skipping.")
@@ -3277,7 +3640,7 @@ def build_for_model(model_name: str, jobs: list[str], repo_root: str, base_out_d
 
 
 def main() -> None:
-    global REPO_URL
+    global REPO_URL, ARCHIVE_ENABLED
     parser = argparse.ArgumentParser(description="Build AtomisticSkills solver evaluation website.")
     parser.add_argument("jobs", nargs="*", default=DEFAULT_JOBS, help="Jobs directories to parse")
     parser.add_argument("--model", default="all", help="Model name to filter statistics for (default: 'all')")
@@ -3285,8 +3648,12 @@ def main() -> None:
     parser.add_argument("-o", "--out", default=DEFAULT_OUT_DIR, help="Output web directory")
     parser.add_argument("--repo-root", default=".", help="Root directory of the repository")
     parser.add_argument("--repo-url", default=REPO_URL, help="Repository linked from the navbar")
+    parser.add_argument("--archive", "--historical", dest="archive", action="store_true",
+                        help="Also render the separate historical archive page for excluded trials. "
+                             "Archived records are never part of current metrics.")
     args = parser.parse_args()
     REPO_URL = args.repo_url
+    ARCHIVE_ENABLED = bool(args.archive)
 
     repo_root = os.path.abspath(args.repo_root)
     out_dir = os.path.abspath(args.out)
@@ -3360,13 +3727,19 @@ def main() -> None:
     print(f"=======================================================")
 
 
-    if OTHER_VERSION:
-        print(f"\nNote: {len(OTHER_VERSION)} displayed trials ran on a different task revision than the one shipped:")
-        per_model: dict[str, int] = {}
-        for model in OTHER_VERSION.values():
-            per_model[model] = per_model.get(model, 0) + 1
-        for model, count in sorted(per_model.items()):
-            print(f"  {model}: {count}")
+    model_filter = None if args.model in (None, "", "all") else args.model
+    archive_records = collect_archive_records(args.jobs, repo_root, model_filter=model_filter)
+    if ARCHIVE_ENABLED:
+        archive_path = os.path.join(out_dir, "archive", "index.html")
+        render_archive_page(archive_records, archive_path)
+        print(f"\n=======================================================")
+        print(f"SUCCESS: Rendered historical archive of {len(archive_records)} excluded trials to: {archive_path}")
+        print("This archive is separate from the current leaderboard and contributes no current metrics.")
+        print(f"=======================================================")
+    else:
+        print(f"\nNote: {len(archive_records)} trials were excluded from current metrics "
+              "(superseded revision, infrastructure error, or no reward).")
+        print("Run with --archive to render them on a separate historical page.")
 
 
 if __name__ == "__main__":

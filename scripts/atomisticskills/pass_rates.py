@@ -14,6 +14,7 @@ import collections
 import datetime
 import glob
 import json
+import math
 import os
 import sys
 
@@ -101,11 +102,8 @@ def collect(jobs_dirs, crashed=None):
         for cfg in glob.glob(os.path.join(jd, "*", "*", "config.json")):
             tdir = os.path.dirname(cfg)
             reward_file = os.path.join(tdir, "verifier", "reward.txt")
-            if not os.path.exists(reward_file):
-                continue
             try:
                 conf = json.load(open(cfg))
-                reward = float(open(reward_file).read().strip())
             except Exception:
                 continue
             path = (conf.get("task") or {}).get("path") or ""
@@ -127,12 +125,17 @@ def collect(jobs_dirs, crashed=None):
             if not name:
                 continue
             if crashed_trial(tdir):
-                # The agent process died (bad credentials, container failure,
-                # stream timeout) rather than producing a wrong answer. Harbor
-                # still writes reward 0, which would otherwise be pooled in as a
-                # genuine solver failure -- nine 401-auth trials once turned a
-                # 10/10 no-skill result into 4/7, 3/6, 3/6.
+                # Harbor may not write a reward at all, for example when the
+                # verifier fails to compute its reference. Neither outcome is a
+                # solver failure; report the exception separately.
                 crashed.append({"task": path.rstrip("/").split("/")[-1], "agent": name})
+                continue
+            try:
+                with open(reward_file, encoding="utf-8") as f:
+                    reward = float(f.read().strip())
+            except (OSError, ValueError):
+                continue
+            if not math.isfinite(reward):
                 continue
             has_skills = bool(agent.get("skills")) or ("AtomisticSkills" in json.dumps(conf))
             try:
@@ -192,8 +195,8 @@ def main() -> None:
         f"over {len(set(r['task'] for r in recs))} tasks.\n")
     if crashed:
         cc = collections.Counter(c["task"] for c in crashed)
-        add(f"Excluding {len(crashed)} trials that died with an agent/infrastructure "
-            f"error before answering (not solver failures): "
+        add(f"Excluding {len(crashed)} trials with an agent or verifier infrastructure "
+            f"error (not solver failures): "
             + ", ".join(f"`{k}` \u00d7{v}" for k, v in sorted(cc.items())) + ".\n")
     if dropped:
         stale = collections.Counter(r["task"] for r in dropped if r["agent"] not in ("oracle", "nop"))

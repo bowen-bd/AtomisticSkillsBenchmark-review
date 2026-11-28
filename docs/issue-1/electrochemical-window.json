@@ -1,0 +1,254 @@
+{
+  "schema_version": 1,
+  "task": "electrochemical-window",
+  "published_site_commit": "d9610cfcecfe8dc44d97c6a7546deee3caeb7d21",
+  "reference_sha256": "e0d1806249c82da5d17da8bde84577f52960b14eee4664773455d090905e3730",
+  "rule": "Revised numerical reference; four original output keys and original tolerances. No requirement for newer output fields.",
+  "original_tolerances_V": {
+    "reduction_voltage_V": 0.02,
+    "oxidation_voltage_V": 0.02,
+    "window_width_V": 0.03
+  },
+  "sensitivity_tolerances_V": {
+    "reduction_voltage_V": 0.01,
+    "oxidation_voltage_V": 0.01,
+    "window_width_V": 0.02
+  },
+  "scope": "Saved-artifact regrade only. It does not prove target identity, relaxation, or performance with the revised prompt.",
+  "counts": {
+    "recorded": {
+      "fail": 3,
+      "pass": 15
+    },
+    "regraded": {
+      "fail": 3,
+      "pass": 15
+    },
+    "voltage_tolerance_sensitivity": {
+      "fail": 9,
+      "pass": 9
+    }
+  },
+  "cards": [
+    {
+      "card": "ecw-01",
+      "model": "Claude Opus 5",
+      "mode": "no-skill",
+      "recorded": "fail",
+      "regraded": "fail",
+      "outside_original_tolerance": [
+        "reduction_voltage_V",
+        "oxidation_voltage_V",
+        "window_width_V",
+        "stable"
+      ],
+      "voltage_tolerance_sensitivity": "fail",
+      "outside_sensitivity_tolerance": [
+        "reduction_voltage_V",
+        "oxidation_voltage_V",
+        "window_width_V",
+        "stable"
+      ]
+    },
+    {
+      "card": "ecw-02",
+      "model": "Claude Opus 5",
+      "mode": "with-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "fail",
+      "outside_sensitivity_tolerance": [
+        "oxidation_voltage_V"
+      ]
+    },
+    {
+      "card": "ecw-03",
+      "model": "DeepSeek V4 Flash",
+      "mode": "no-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "fail",
+      "outside_sensitivity_tolerance": [
+        "oxidation_voltage_V"
+      ]
+    },
+    {
+      "card": "ecw-04",
+      "model": "DeepSeek V4 Flash",
+      "mode": "with-skill",
+      "recorded": "fail",
+      "regraded": "fail",
+      "outside_original_tolerance": [
+        "reduction_voltage_V",
+        "oxidation_voltage_V",
+        "window_width_V"
+      ],
+      "voltage_tolerance_sensitivity": "fail",
+      "outside_sensitivity_tolerance": [
+        "reduction_voltage_V",
+        "oxidation_voltage_V",
+        "window_width_V"
+      ]
+    },
+    {
+      "card": "ecw-05",
+      "model": "GLM-5.3 Flash",
+      "mode": "no-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "fail",
+      "outside_sensitivity_tolerance": [
+        "oxidation_voltage_V"
+      ]
+    },
+    {
+      "card": "ecw-06",
+      "model": "GLM-5.3 Flash",
+      "mode": "with-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "pass",
+      "outside_sensitivity_tolerance": []
+    },
+    {
+      "card": "ecw-07",
+      "model": "GPT-5.6 Luna",
+      "mode": "no-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "fail",
+      "outside_sensitivity_tolerance": [
+        "oxidation_voltage_V"
+      ]
+    },
+    {
+      "card": "ecw-08",
+      "model": "GPT-5.6 Luna",
+      "mode": "no-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "fail",
+      "outside_sensitivity_tolerance": [
+        "oxidation_voltage_V"
+      ]
+    },
+    {
+      "card": "ecw-09",
+      "model": "GPT-5.6 Luna",
+      "mode": "no-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "fail",
+      "outside_sensitivity_tolerance": [
+        "oxidation_voltage_V"
+      ]
+    },
+    {
+      "card": "ecw-10",
+      "model": "GPT-5.6 Luna",
+      "mode": "with-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "pass",
+      "outside_sensitivity_tolerance": []
+    },
+    {
+      "card": "ecw-11",
+      "model": "GPT-5.6 Luna",
+      "mode": "with-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "pass",
+      "outside_sensitivity_tolerance": []
+    },
+    {
+      "card": "ecw-12",
+      "model": "GPT-5.6 Luna",
+      "mode": "with-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "pass",
+      "outside_sensitivity_tolerance": []
+    },
+    {
+      "card": "ecw-13",
+      "model": "GPT-5.6 Sol",
+      "mode": "no-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "pass",
+      "outside_sensitivity_tolerance": []
+    },
+    {
+      "card": "ecw-14",
+      "model": "GPT-5.6 Sol",
+      "mode": "with-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "pass",
+      "outside_sensitivity_tolerance": []
+    },
+    {
+      "card": "ecw-15",
+      "model": "Gemini 3.7 Flash",
+      "mode": "no-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "pass",
+      "outside_sensitivity_tolerance": []
+    },
+    {
+      "card": "ecw-16",
+      "model": "Gemini 3.7 Flash",
+      "mode": "with-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "pass",
+      "outside_sensitivity_tolerance": []
+    },
+    {
+      "card": "ecw-17",
+      "model": "Qwen3.8-27B",
+      "mode": "no-skill",
+      "recorded": "fail",
+      "regraded": "fail",
+      "outside_original_tolerance": [
+        "reduction_voltage_V",
+        "oxidation_voltage_V",
+        "window_width_V",
+        "stable"
+      ],
+      "voltage_tolerance_sensitivity": "fail",
+      "outside_sensitivity_tolerance": [
+        "reduction_voltage_V",
+        "oxidation_voltage_V",
+        "window_width_V",
+        "stable"
+      ]
+    },
+    {
+      "card": "ecw-18",
+      "model": "Qwen3.8-27B",
+      "mode": "with-skill",
+      "recorded": "pass",
+      "regraded": "pass",
+      "outside_original_tolerance": [],
+      "voltage_tolerance_sensitivity": "pass",
+      "outside_sensitivity_tolerance": []
+    }
+  ]
+}
