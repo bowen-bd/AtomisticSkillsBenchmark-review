@@ -8,6 +8,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sys
 import tempfile
 import tomllib
 import unittest
@@ -185,22 +186,89 @@ class IssueOneTests(unittest.TestCase):
                         result.write_text(json.dumps(candidate))
                         verifier.test_result_identity_and_thermochemistry()
 
-    def test_synthesis_counts_only_distinct_supported_routes(self):
-        if importlib.util.find_spec("pymatgen") is None:
-            self.skipTest("requires pymatgen")
+    def synthesis(self):
         task = MATERIALS / "synthesis-precursor-recommendation"
-        verifier = load_module(task / "tests/test_outputs.py")
-        expected = read_json(task / "tests/expected.json")
-        curated = read_json(task / "solution/curated_combinations.json")
-        routes = [r["representative_formulas"] for r in curated["routes"]]
-        minimum = expected["required_routes_count"]
-        reference = {"target_formula": curated["target_formula"]}
-        extras = [routes[0][::-1], ["H2O", "CO2"], None]
-        for combinations in (routes[:minimum], routes, extras + routes[:minimum]):
-            verifier.check_result(reference | {"precursor_combinations": combinations}, expected)
-        with self.assertRaisesRegex(AssertionError, f"found {minimum - 1}"):
-            verifier.check_result(reference | {"precursor_combinations": extras + routes[:minimum - 1]},
-                                  expected)
+        with patch.object(sys, "path", [str(task / "tests"), *sys.path]):
+            verifier = load_module(task / "tests/test_outputs.py")
+        return verifier, read_json(task / "tests/expected.json"), read_json(task / "solution/curated_combinations.json")
+
+    def test_synthesis_counts_only_distinct_supported_routes(self):
+        verifier, expected, fixture = self.synthesis()
+        routes = fixture["precursor_combinations"]
+        verifier.check_result(fixture, expected)
+        verifier.check_result(fixture | {"target_formula": "Na3 V2 P3 O12"}, expected)
+        for additional in ([routes[0][::-1], ["H2O", "CO2"], None], []):
+            verifier.check_result(fixture | {"precursor_combinations": additional + routes}, expected)
+        with self.assertRaisesRegex(AssertionError, "found 4"):
+            verifier.check_result(fixture | {"precursor_combinations": routes[:-1] + [routes[0][::-1]]}, expected)
+        with self.assertRaisesRegex(AssertionError, "wrong target"):
+            verifier.check_result(fixture | {"target_formula": "Na6V4(PO4)6"}, expected)
+
+    def test_synthesis_exact_identity_and_scoped_experimental_variants(self):
+        verifier, expected, _ = self.synthesis()
+        key, index = verifier.route_key, verifier.build_index(expected)
+        formula = verifier.precursor_formula_key
+        self.assertNotEqual(formula("NO2"), formula("N2O4"))
+        self.assertNotEqual(formula("NH3"), formula("NH4OH"))
+        self.assertEqual(formula("NH3·H2O"), formula("NH4OH"))
+        for bad in ("0.5Na2CO3", "NaH2PO4·0.5H2O", "Na₂CO₃·2H2Ofoo", "Na(OH]", "Na01OH"):
+            self.assertIsNone(formula(bad))
+        for route in expected["routes"]:
+            core = key(route["precursors"])
+            self.assertEqual(index[core], core)
+            for source in route["evidence"]:
+                self.assertEqual(index[key(source["reported_core"] + source.get("ancillary", []))], core)
+        hydrate = ["NaH₂PO₄.2H2O", "V2O5"]
+        self.assertEqual(index[key(hydrate)], index[key(["NaH2PO4", "V2O5"])])
+        acetate = ["NaOAc", "NH4H2PO4", "V(Acac)3"]
+        self.assertEqual(index[key(acetate)], index[key(["CH3COONa", "NH4H2PO4", "V(C5H7O2)3"])])
+        self.assertIn(key(["Na2CO3", "NH4H2PO4", "VO(acac)2"]), index)
+        self.assertIn(key(["Na3C6H5O7·2H2O", "NH4VO3", "NH4H2PO4"]), index)
+        self.assertIn(key(["NaH2PO4·2H2O", "NH4VO3", "C12H22O11"]), index)
+        self.assertIn(key(["NaH6PO6", "NH4VO3", "C6H12O6"]), index)
+        self.assertIn(key(["NaH2PO4", "V2O5", "C12H22O11"]), index)
+        self.assertIn(key(["NaOH", "V2O5", "NH4H2PO4", "C2H2O4", "C6H12O6"]), index)
+        for unsupported in (
+            ["NaH2PO4·H2O", "V2O5"], ["NaH2PO4·7H2O", "V2O5"],
+            ["NaH2PO4", "NaH2PO4·2H2O", "V2O5"],
+            ["NaH2PO4·H2O", "NH4VO3", "C12H22O11"],  # sucrose is co-reported with dihydrate
+            ["NaH2PO4·H2O", "NH4VO3", "C6H12O6"],  # glucose is reported with the dihydrate
+            ["Na3C6H5O7·H2O", "NH4VO3", "NH4H2PO4"],
+            ["VPO4", "Na3PO4"],  # an intermediate is not the full route
+            ["NaOH", "NH4VO3", "NH4H2PO4", "Ni(NO3)2"],
+            ["Na2CO3", "NH4H2PO4", "NH4V3O8", "C6H12O6"],
+            ["NaCO3", "NH4H2PO4", "V2O5"],
+            acetate[:-1] + ["V(acac)5"], acetate[:-1] + ["VO(acac)2"],
+        ):
+            self.assertNotIn(key(unsupported), index, unsupported)
+
+    def test_synthesis_five_new_published_routes_can_pass(self):
+        verifier, expected, fixture = self.synthesis()
+        new_routes = [
+            ["NaHCO3", "NH4VO3", "NH4H2PO4"],
+            ["NaAc", "NH4VO3", "NH4H2PO4"],
+            ["NaNO3", "NH4VO3", "NH4H2PO4"],
+            ["Na3C6H5O7·2H2O", "NH4VO3", "NH4H2PO4"],
+            ["Na2C2O4", "V2O5", "NH4H2PO4"],
+        ]
+        verifier.check_result(fixture | {"precursor_combinations": new_routes}, expected)
+        for replacement in (
+            ["NaCO3", "V2O5", "NH4H2PO4"],
+            ["NaNO3", "NH4VO3", "NaH2PO4"],
+            ["VPO4", "Na3PO4"],
+        ):
+            with self.subTest(replacement=replacement), self.assertRaisesRegex(AssertionError, "found 4"):
+                verifier.check_result(fixture | {"precursor_combinations": new_routes[:-1] + [replacement]}, expected)
+
+    def test_synthesis_reference_requires_experimental_evidence(self):
+        verifier, expected, _ = self.synthesis()
+        for replacements in ({"tier": "snippet"}, {"product": "NaV3(PO4)3"}, {"locator": ""},
+                             {"reported_core": ["Na2O", "NH4VO3", "NH4H2PO4"]},
+                             {"ancillary": ["NH4VO3"]}):
+            bad = deepcopy(expected)
+            bad["routes"][0]["evidence"][0].update(replacements)
+            with self.subTest(replacements=replacements), self.assertRaises(ValueError):
+                verifier.build_index(bad)
 
     def test_crashes_are_reported_even_without_reward(self):
         report = load_module(ROOT / "scripts/atomisticskills/pass_rates.py")

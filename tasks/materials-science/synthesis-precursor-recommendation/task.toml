@@ -11,9 +11,9 @@ author_email = "bowend@mit.edu"
 author_organization = ["MIT"]
 author_profile = ["https://github.com/learningmatter-mit"]
 conflicts_of_interest = "No conflict of interest."
-difficulty_explanation = "Requires retrieving and distinguishing published experimental synthesis precursor combinations for Na3V2(PO4)3 in the Materials Project synthesis corpus."
-solution_explanation = "The reference solution extracts precursor sets from Materials Project synthesis records and uses a pinned corpus fallback when needed."
-verification_explanation = "At least five distinct normalized precursor sets must match the fixed reference corpus. Unknown or duplicate extras do not count."
+difficulty_explanation = "Requires retrieving and distinguishing experimental precursor sets for undoped Na3V2(PO4)3, including separating stoichiometric precursors from optional additives."
+solution_explanation = "The bundled oracle emits a fixed, source-audited contract fixture without making API calls."
+verification_explanation = "At least five distinct core precursor sets must match the fixed, source-audited corpus. Documented spelling and formulation variants do not add separate routes."
 domain = "atomisticskills"
 field = "materials-science"
 subfield = "synthesis recommendation"
@@ -40,5 +40,5 @@ storage_mb = 4096
 gpus = 0
 
 [environment.env]
-# Optional for the bundled oracle, which has a curated-data fallback.
+# Required to query the live MP API, but not for the offline contract oracle.
 MP_API_KEY = "${MP_API_KEY:-}"

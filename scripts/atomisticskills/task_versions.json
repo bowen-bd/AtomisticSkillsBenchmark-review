@@ -146,7 +146,7 @@
   },
   "synthesis-precursor-recommendation": {
     "path": "tasks/materials-science/synthesis-precursor-recommendation",
-    "release": "55b5fee508627fb3cec84150c62fda9b4f2932fccad7cdc92a7e531b9923d916",
+    "release": "39fae47804dcc52b421d4a7c3fb6d8c42488bc194287991ac092403e162e3c64",
     "verified": []
   },
   "xrd-mixture-phase-fit": {

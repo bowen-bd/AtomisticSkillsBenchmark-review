@@ -1,90 +1,143 @@
 {
-  "_comment": "Fixed Materials Project precursor corpus. Mirror these keys in solution/curated_combinations.json and run solution/check_consistency.py after changes. The invalid NaCO3 text-mined entry was removed after checking its source.",
   "target_formula": "Na3V2(PO4)3",
   "required_routes_count": 5,
-  "valid_canonical_combinations": [
-    [
-      "H1Na1O1",
-      "H4N1O3V1",
-      "H6N1O4P1"
-    ],
-    [
-      "C1Na2O3",
-      "H6N1O4P1",
-      "O5V2"
-    ],
-    [
-      "H2Na1O4P1",
-      "O5V2"
-    ],
-    [
-      "O3V2",
-      "H2Na1O4P1"
-    ],
-    [
-      "H4N1O3V1",
-      "H2Na1O4P1"
-    ],
-    [
-      "H4N1O3V1",
-      "C1Na2O3",
-      "H6N1O4P1"
-    ],
-    [
-      "H2Na1O4P1",
-      "H2K1O4P1",
-      "O5V2"
-    ],
-    [
-      "F1Na1",
-      "H4N1O3V1",
-      "C1Na2O3",
-      "H6N1O4P1"
-    ],
-    [
-      "H4N1O3V1",
-      "H2Na1O4P1",
-      "N2Ni1O6"
-    ],
-    [
-      "H4N1O3V1",
-      "H2Na1O4P1",
-      "H6N1O4P1"
-    ],
-    [
-      "H1Na1O1",
-      "H4N1O3V1",
-      "H6N1O4P1",
-      "H1Li1O1"
-    ],
-    [
-      "H3O4P1",
-      "H5N1O1",
-      "H1Na1O1",
-      "H4N1O3V1",
-      "H3N1"
-    ],
-    [
-      "C4H6Mg1O4",
-      "H1Na1O1",
-      "H4N1O3V1",
-      "H6N1O4P1"
-    ],
-    [
-      "C2H3Na1O2",
-      "H6N1O4P1",
-      "C25H35O10V1"
-    ],
-    [
-      "H4N1O3V1",
-      "H5N1O1",
-      "C1Na2O3",
-      "H6N1O4P1"
-    ],
-    [
-      "H1Na1O1",
-      "H6N1O4P1",
-      "O5V2"
-    ]
+  "precursor_families": [
+    ["NaH2PO4", "NaH2PO4·H2O", "NaH2PO4·2H2O"],
+    ["Na3C6H5O7", "Na3C6H5O7·2H2O"]
+  ],
+  "routes": [
+    {
+      "precursors": ["NaOH", "NH4VO3", "NH4H2PO4"],
+      "evidence": [
+        {"doi": "10.1088/2053-1591/ac7a95", "tier": "experimental-section", "locator": "Experimental, sample B (not the spent-electrolyte sample A)", "product": "Na3V2(PO4)3/C", "reported_core": ["NaOH", "NH4VO3", "NH4H2PO4"], "ancillary": ["C6H8O7·H2O"]},
+        {"doi": "10.1038/s41467-025-64351-9", "tier": "experimental-section", "locator": "Methods, Preparation of Na3V2(PO4)3, before positive electrode assembly", "product": "Na3V2(PO4)3", "reported_core": ["NaOH", "NH4VO3", "NH4H2PO4"], "ancillary": ["C6H8O7"]},
+        {"doi": "10.1039/c6ta07109k", "tier": "mp-experimental-record", "locator": "Solid-state comparison sample G-NVP; text-mined reagents and reaction", "product": "Na3V2(PO4)3/C", "reported_core": ["NaOH", "NH4VO3", "NH4H2PO4"]}
+      ]
+    },
+    {
+      "precursors": ["Na2CO3", "NH4H2PO4", "V2O5"],
+      "evidence": [
+        {"doi": "10.7513/j.issn.1004-7638.2025.02.011", "tier": "experimental-section", "locator": "Section 1.1 and Figure 1, high-purity V2O5 control GC-NVP; oxalic acid hydration unspecified", "product": "Na3V2(PO4)3/C", "reported_core": ["Na2CO3", "NH4H2PO4", "V2O5"], "ancillary": ["C6H8O7·H2O", "H2C2O4"]},
+        {"doi": "10.1039/d4ra04221b", "tier": "experimental-section", "locator": "Experimental, Synthesis of Na3V2(PO4)3@C", "product": "Na3V2(PO4)3/C", "reported_core": ["Na2CO3", "NH4H2PO4", "V2O5"], "ancillary": ["C6H8O6"]},
+        {"doi": "10.1038/srep25809", "tier": "experimental-section", "locator": "Methods, Synthesis of M3V2(PO4)3 (M = Li, Na); sodium counterpart", "product": "Na3V2(PO4)3/C", "reported_core": ["Na2CO3", "NH4H2PO4", "V2O5"], "ancillary": ["C6H8O7"]},
+        {"doi": "10.1039/c6ta05030a", "tier": "experimental-section", "locator": "Experimental, Hydrothermal synthesis of Na3V2(PO4)3 nanofibers and Carbon coated Na3V2(PO4)3/C composites; NUS repository full text. Chemical name sucrose, rather than its mistyped elemental formula.", "product": "Na3V2(PO4)3/C", "reported_core": ["Na2CO3", "NH4H2PO4", "V2O5"], "ancillary": ["H2C2O4·2H2O", "C12H22O11"]},
+        {"doi": "10.1002/adma.201502018", "tier": "mp-experimental-record", "locator": "Synthesis of Na3V2(PO4)3 paragraph explicitly names all three reagents", "product": "Na3V2(PO4)3", "reported_core": ["Na2CO3", "NH4H2PO4", "V2O5"]}
+      ]
+    },
+    {
+      "precursors": ["NaH2PO4", "V2O5"],
+      "evidence": [
+        {"doi": "10.1016/j.nanoen.2022.107010", "tier": "experimental-section", "locator": "Section 2.1, synthesis; paper says sugar without specifying molecular identity", "product": "Na3V2(PO4)3/C", "reported_core": ["NaH2PO4·2H2O", "V2O5"]},
+        {"doi": "10.1021/acs.chemmater.3c02585", "tier": "experimental-section", "locator": "Experimental Section, ball milling; sugar is explicitly C12H22O11", "product": "Na3V2(PO4)3/C", "reported_core": ["NaH2PO4·2H2O", "V2O5"], "ancillary": ["C12H22O11"]},
+        {"doi": "10.1038/s41467-022-32606-4", "tier": "experimental-section", "locator": "Methods, Na3V2(PO4)3 synthesis; NVP cathode before electrode coating", "product": "Na3V2(PO4)3/C", "reported_core": ["NaH2PO4", "V2O5"], "ancillary": ["H2C2O4", "C6H12O6"]},
+        {"doi": "10.1039/d5ra08915h", "tier": "experimental-section", "locator": "Experimental, synthesis of Na3V2(PO4)3/C; single experiment with both acids", "product": "Na3V2(PO4)3/C", "reported_core": ["NaH2PO4", "V2O5"], "ancillary": ["H2C2O4", "C6H8O7"]},
+        {"doi": "10.1016/j.cej.2018.01.098", "tier": "mp-experimental-record", "locator": "Cathode preparation paragraph for the full cell, not the coal-tar pitch anode", "product": "Na3V2(PO4)3", "reported_core": ["NaH2PO4", "V2O5"]}
+      ]
+    },
+    {
+      "precursors": ["NaH2PO4", "V2O3"],
+      "evidence": [
+        {"doi": "10.1002/aenm.201200558", "tier": "mp-experimental-record", "locator": "Na3V2(PO4)3/C synthesis paragraph and extracted dihydrate/V2O3 reagents", "product": "Na3V2(PO4)3/C", "reported_core": ["NaH2PO4·2H2O", "V2O3"]},
+        {"doi": "10.1016/j.jpowsour.2017.10.083", "tier": "mp-experimental-record", "locator": "Cathode preparation and cell assembling, not electrolyte synthesis", "product": "Na3V2(PO4)3", "reported_core": ["NaH2PO4", "V2O3"]}
+      ]
+    },
+    {
+      "precursors": ["NaH2PO4", "NH4VO3"],
+      "evidence": [
+        {"doi": "10.1002/smtd.202502388", "tier": "experimental-section", "locator": "NVP Synthesis and Figure 1; carbon-coated NVP from segmented flow and batch controls", "product": "Na3V2(PO4)3/C", "reported_core": ["NaH2PO4·2H2O", "NH4VO3"], "ancillary": ["C6H8O7·H2O", "C12H22O11"]},
+        {"doi": "10.1016/j.jelechem.2016.11.064", "tier": "mp-experimental-record", "locator": "NVP/C sol-gel experimental extract names citric acid; text-mined target and balanced reactants establish the core", "product": "Na3V2(PO4)3/C", "reported_core": ["NaH2PO4", "NH4VO3"], "ancillary": ["C6H8O7"]},
+        {"doi": "10.1016/j.matlet.2017.04.017", "tier": "mp-experimental-record", "locator": "Chemical reduction and sodiation; experimental extract names monohydrate, metavanadate and oxalic acid", "product": "Na3V2(PO4)3/C", "reported_core": ["NaH2PO4·H2O", "NH4VO3"], "ancillary": ["H2C2O4"]},
+        {"doi": "10.1016/j.jpowsour.2014.04.054", "tier": "mp-experimental-record", "locator": "NVP/C carbothermal reduction extract; dihydrate plus metavanadate", "product": "Na3V2(PO4)3/C", "reported_core": ["NaH2PO4·2H2O", "NH4VO3"]},
+        {"doi": "10.1007/s40820-020-0381-y", "tier": "experimental-section", "locator": "Methods, Synthesis of NVP/C Powders, before preparing the full cell", "product": "Na3V2(PO4)3/C", "reported_core": ["NaH2PO4·2H2O", "NH4VO3"], "ancillary": ["C6H12O6"]},
+        {"doi": "10.1016/j.jpowsour.2013.09.051", "tier": "mp-experimental-record", "locator": "Monoclinic NASICON active material solid-state preparation", "product": "Na3V2(PO4)3", "reported_core": ["NaH2PO4", "NH4VO3"]}
+      ]
+    },
+    {
+      "precursors": ["Na2CO3", "NH4VO3", "NH4H2PO4"],
+      "evidence": [
+        {"doi": "10.1021/acsami.5c08411", "tier": "experimental-section", "locator": "Sample Preparation and Equation 1, x = 0 control; exclude ammonium alum", "product": "Na3V2(PO4)3", "reported_core": ["Na2CO3", "NH4VO3", "NH4H2PO4"], "ancillary": ["C6H8O7"]},
+        {"doi": "10.3390/nano13030446", "tier": "experimental-section", "locator": "Section 2.1, parallel NVP@C and NVP bulk; the bulk omits melamine", "product": "Na3V2(PO4)3/C", "reported_core": ["Na2CO3", "NH4VO3", "NH4H2PO4"], "ancillary": ["C3H6N6"]},
+        {"doi": "10.1039/c9ra08402a", "tier": "experimental-section", "locator": "Material synthesis and electrode preparation, spray drying the NVP powder; glucose carbon precursor", "product": "Na3V2(PO4)3/C", "reported_core": ["Na2CO3", "NH4VO3", "NH4H2PO4"], "ancillary": ["C6H12O6"]},
+        {"doi": "10.1039/c5ta00528k", "tier": "mp-experimental-record", "locator": "NVP/C sol-gel paragraph; aqueous ammonia listed separately from balanced reactants", "product": "Na3V2(PO4)3/C", "reported_core": ["Na2CO3", "NH4VO3", "NH4H2PO4"], "ancillary": ["NH4OH", "C6H8O7"]}
+      ]
+    },
+    {
+      "precursors": ["NaOH", "NH4H2PO4", "V2O5"],
+      "evidence": [
+        {"doi": "10.1016/j.jpowsour.2016.06.096", "tier": "publisher-abstract", "locator": "Publisher abstract explicitly names all five starting materials for NVP/C; Materials Project independently extracts the three core reagents from the same paper", "product": "Na3V2(PO4)3/C", "reported_core": ["NaOH", "NH4H2PO4", "V2O5"], "ancillary": ["H2C2O4", "C6H12O6"]}
+      ]
+    },
+    {
+      "precursors": ["NaOH", "NH4VO3", "H3PO4"],
+      "evidence": [
+        {"doi": "10.1149/2.015209jes", "tier": "mp-experimental-record", "locator": "NASICON NVP sol-gel experimental extract and balanced reaction; NH3 also occurs as a reaction product", "product": "Na3V2(PO4)3", "reported_core": ["NaOH", "NH4VO3", "H3PO4"], "ancillary": ["NH4OH"]}
+      ]
+    },
+    {
+      "precursors": ["NaOAc", "NH4H2PO4", "V(acac)3"],
+      "evidence": [
+        {"doi": "10.1007/s40243-016-0067-z", "tier": "experimental-section", "locator": "Experimental methods, Syntheses of Na3V2(PO4)3/C nanocomposite. The stated V(III) name and 0.697 g/2 mmol agree; the printed vanadyl formula does not.", "product": "Na3V2(PO4)3/C", "reported_core": ["CH3COONa", "NH4H2PO4", "V(C5H7O2)3"], "ancillary": ["C8H18O5"]}
+      ]
+    },
+    {
+      "precursors": ["Na2CO3", "NH4H2PO4", "NH4V3O8"],
+      "evidence": [
+        {"doi": "10.7513/j.issn.1004-7638.2025.02.011", "tier": "experimental-section", "locator": "Section 1.1 and Figure 1, industrial-grade APV feeds NaH-NVP and GaH-NVP, nominally undoped; Table 1 reports feedstock impurities", "product": "Na3V2(PO4)3/C", "reported_core": ["Na2CO3", "NH4H2PO4", "NH4V3O8"], "ancillary": ["C6H8O7·H2O", "H2C2O4"]}
+      ]
+    },
+    {
+      "precursors": ["NaHCO3", "NH4VO3", "NH4H2PO4"],
+      "evidence": [
+        {"doi": "10.3389/fchem.2018.00174", "tier": "experimental-section", "locator": "Materials and Methods, spray-dried NVP/rGO and parallel NVP/C control without graphene oxide", "product": "Na3V2(PO4)3/C", "reported_core": ["NaHCO3", "NH4VO3", "NH4H2PO4"], "ancillary": ["C6H8O7"]}
+      ]
+    },
+    {
+      "precursors": ["CH3COONa", "NH4VO3", "NH4H2PO4"],
+      "evidence": [
+        {"doi": "10.3390/polym14010149", "tier": "experimental-section", "locator": "Section 2.1 Materials Preparation, porous NVP/C and PVA-free reference NVP/C", "product": "Na3V2(PO4)3/C", "reported_core": ["CH3COONa", "NH4VO3", "NH4H2PO4"], "ancillary": ["C6H8O7"]}
+      ]
+    },
+    {
+      "precursors": ["NaNO3", "NH4VO3", "NH4H2PO4"],
+      "evidence": [
+        {"doi": "10.3390/batteries5030056", "tier": "experimental-section", "locator": "Section 2.1 and Table 1, glycine-nitrate NVP cathode; NVP-spray has added glucose, unlike spray-3", "product": "Na3V2(PO4)3/C", "reported_core": ["NaNO3", "NH4VO3", "NH4H2PO4"], "ancillary": ["C6H8O7", "C2H5NO2", "C6H12O6"]}
+      ]
+    },
+    {
+      "precursors": ["Na2CO3", "VO(C5H7O2)2", "NH4H2PO4"],
+      "evidence": [
+        {"doi": "10.30919/esg1784", "tier": "experimental-section", "locator": "Section 2, Synthesis of NVP; explicitly vanadyl acetylacetonate; DOI as registered by Crossref", "product": "Na3V2(PO4)3", "reported_core": ["Na2CO3", "VO(C5H7O2)2", "NH4H2PO4"]}
+      ]
+    },
+    {
+      "precursors": ["Na3C6H5O7", "NH4VO3", "NH4H2PO4"],
+      "evidence": [
+        {"doi": "10.1038/s41467-021-26032-1", "tier": "experimental-section", "locator": "Methods, electrochemical measurements, NVP@C synthesis before electrode assembly; citrate dihydrate supplies Na", "product": "Na3V2(PO4)3/C", "reported_core": ["Na3C6H5O7·2H2O", "NH4VO3", "NH4H2PO4"]}
+      ]
+    },
+    {
+      "precursors": ["Na2C2O4", "V2O5", "NH4H2PO4"],
+      "evidence": [
+        {"doi": "10.1038/s41467-026-69319-x", "tier": "experimental-section", "locator": "Methods, Synthesis of Na3V2(PO4)3/C (NVP/C) Composite, prepared as the counter-electrode", "product": "Na3V2(PO4)3/C", "reported_core": ["Na2C2O4", "V2O5", "NH4H2PO4"], "ancillary": ["H2C2O4", "C6H12O6"]}
+      ]
+    },
+    {
+      "precursors": ["NaVO3", "Na2CO3", "NH4H2PO4"],
+      "evidence": [
+        {"doi": "10.12422/j.issn.1006-396X.2025.03.006", "tier": "experimental-table", "locator": "Table 1, NVP-NaVO3 reagent row; reagent amounts agree with Na:V:P = 3:2:3. Table 2 reports the resulting phase cell.", "product": "Na3V2(PO4)3", "reported_core": ["NaVO3", "Na2CO3", "NH4H2PO4"]}
+      ]
+    },
+    {
+      "precursors": ["V2O5", "H3PO4", "Na3PO4"],
+      "evidence": [
+        {"patent": "US20190393492A1", "tier": "patent-example", "locator": "Example 1 prepares VPO4/C; section 4.2 uses that intermediate with Na3PO4 and identifies NVP/C by XRD in Figure 6", "product": "Na3V2(PO4)3/C", "reported_core": ["V2O5", "H3PO4", "Na3PO4"], "ancillary": ["H2C2O4", "C2H6O2"]}
+      ]
+    },
+    {
+      "precursors": ["Na2CO3", "V2O5", "(NH4)2HPO4"],
+      "evidence": [
+        {"patent": "WO2002097907A2", "tier": "patent-example", "locator": "Examples 11–12, reactions 15–16; Example 11 reagent list and Example 12 reaction agree on diammonium hydrogen phosphate", "product": "Na3V2(PO4)3/C", "reported_core": ["Na2CO3", "V2O5", "(NH4)2HPO4"], "ancillary": ["C"]}
+      ]
+    }
   ]
 }

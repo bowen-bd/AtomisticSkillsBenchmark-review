@@ -578,9 +578,10 @@ TASK_RUBRICS = {
         },
         "categorical_rules": [
             "The target formula matches the task input",
-            "Only distinct normalized matches to the fixed Materials Project corpus count; extras are not penalized",
+            "Count distinct, source-backed core reagent sets for undoped material, including carbon-coated material",
+            "Documented hydrate and additive variants do not add routes; unrecognized extra candidates do not count",
         ],
-        "verifier_method": "Checks canonical precursor sets against the curated reference corpus.",
+        "verifier_method": "Checks exact formula counts against a fixed corpus of audited experiments and Materials Project records.",
     },
     "xrd-mixture-phase-fit": {
         "title": "Two-Phase XRD Quantitative Phase Analysis (Rietveld Refinement)",
