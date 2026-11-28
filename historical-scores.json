@@ -1,0 +1,187 @@
+{
+  "schema_version": 1,
+  "benchmark_version": "v0.2",
+  "score_type": "historical_review",
+  "original_site_commit": "d9610cfcecfe8dc44d97c6a7546deee3caeb7d21",
+  "task_revision": "826c1bd49418df308a4a45ba539e1390ecd45186",
+  "task_count": 31,
+  "tasks_carried_forward": 28,
+  "new_model_trials_included": 0,
+  "models": [
+    {
+      "model": "GPT-5.6 Sol",
+      "runner": "codex",
+      "trials_per_task_per_mode": 1,
+      "no_skill": {
+        "trials": 31,
+        "original_passes": 26,
+        "credited_passes": 25,
+        "recorded_failures": 5,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 1
+      },
+      "with_skill": {
+        "trials": 31,
+        "original_passes": 30,
+        "credited_passes": 30,
+        "recorded_failures": 1,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 0
+      }
+    },
+    {
+      "model": "Gemini 3.7 Flash",
+      "runner": "terminus-2",
+      "trials_per_task_per_mode": 1,
+      "no_skill": {
+        "trials": 31,
+        "original_passes": 25,
+        "credited_passes": 25,
+        "recorded_failures": 6,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 0
+      },
+      "with_skill": {
+        "trials": 31,
+        "original_passes": 31,
+        "credited_passes": 31,
+        "recorded_failures": 0,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 0
+      }
+    },
+    {
+      "model": "Claude Opus 5",
+      "runner": "terminus-2",
+      "trials_per_task_per_mode": 1,
+      "no_skill": {
+        "trials": 31,
+        "original_passes": 25,
+        "credited_passes": 25,
+        "recorded_failures": 6,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 0
+      },
+      "with_skill": {
+        "trials": 31,
+        "original_passes": 31,
+        "credited_passes": 31,
+        "recorded_failures": 0,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 0
+      }
+    },
+    {
+      "model": "GLM-5.3 Flash",
+      "runner": "terminus-2",
+      "trials_per_task_per_mode": 1,
+      "no_skill": {
+        "trials": 31,
+        "original_passes": 24,
+        "credited_passes": 24,
+        "recorded_failures": 7,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 0
+      },
+      "with_skill": {
+        "trials": 31,
+        "original_passes": 27,
+        "credited_passes": 27,
+        "recorded_failures": 4,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 0
+      }
+    },
+    {
+      "model": "DeepSeek V4 Flash",
+      "runner": "terminus-2",
+      "trials_per_task_per_mode": 1,
+      "no_skill": {
+        "trials": 31,
+        "original_passes": 23,
+        "credited_passes": 22,
+        "recorded_failures": 8,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 1
+      },
+      "with_skill": {
+        "trials": 31,
+        "original_passes": 27,
+        "credited_passes": 27,
+        "recorded_failures": 4,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 0
+      }
+    },
+    {
+      "model": "GPT-5.6 Luna",
+      "runner": "codex",
+      "trials_per_task_per_mode": 3,
+      "no_skill": {
+        "trials": 93,
+        "original_passes": 68,
+        "credited_passes": 66,
+        "recorded_failures": 25,
+        "snippet_dependent": 1,
+        "insufficient_evidence": 1
+      },
+      "with_skill": {
+        "trials": 93,
+        "original_passes": 89,
+        "credited_passes": 88,
+        "recorded_failures": 4,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 1
+      }
+    },
+    {
+      "model": "Qwen3.8-27B",
+      "runner": "codex",
+      "trials_per_task_per_mode": 1,
+      "no_skill": {
+        "trials": 31,
+        "original_passes": 16,
+        "credited_passes": 16,
+        "recorded_failures": 15,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 0
+      },
+      "with_skill": {
+        "trials": 31,
+        "original_passes": 24,
+        "credited_passes": 23,
+        "recorded_failures": 7,
+        "snippet_dependent": 0,
+        "insufficient_evidence": 1
+      }
+    }
+  ],
+  "aggregates": {
+    "no_skill": {
+      "trials": 279,
+      "original_passes": 207,
+      "credited_passes": 203,
+      "recorded_failures": 72,
+      "snippet_dependent": 1,
+      "insufficient_evidence": 3,
+      "model_mean_min": 0.7327188940092166,
+      "model_mean_max": 0.7450076804915514
+    },
+    "with_skill": {
+      "trials": 279,
+      "original_passes": 259,
+      "credited_passes": 257,
+      "recorded_failures": 20,
+      "snippet_dependent": 0,
+      "insufficient_evidence": 2,
+      "model_mean_min": 0.9139784946236559,
+      "model_mean_max": 0.9201228878648233
+    }
+  },
+  "notes": [
+    "No historical reward was overwritten. All 558 trials retain their original denominator.",
+    "Unresolved results are not failures. Each range runs from credited passes to credited plus unresolved, not a statistical interval.",
+    "Only the synthesis audit changes score credit. NIST retains original passes with a prompt-disclosure caveat; ECW reproduces original outcomes.",
+    "Task and runtime revisions differ from the original runs; archived task-version provenance is incomplete."
+  ]
+}

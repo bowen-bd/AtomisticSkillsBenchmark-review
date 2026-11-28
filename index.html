@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
-  <meta name="description" content="AtomisticSkills Benchmark v0.2 preview: task changes, historical audit outcomes, and current-revision pilot results.">
+  <meta name="description" content="AtomisticSkills Benchmark v0.2 preview: historical leaderboard, audit outcomes, and separate current-revision pilot results.">
   <title>AtomisticSkills Benchmark v0.2 Preview</title>
   <style>
     :root { color-scheme: light dark; --paper:#f6f8fb; --ink:#15222d; --muted:#4b5e6f; --card:#fff; --border:#cbd6df; --accent:#135b55; --tint:#e8f5f2; }
@@ -37,11 +37,39 @@
 <body>
   <main>
     <header>
-      <a class="badge" href="#changes">v0.2 Preview</a>
+      <a class="badge" href="#leaderboard">v0.2 Preview</a>
       <h1>AtomisticSkills Benchmark</h1>
-      <p><strong>All 31 tasks are retained.</strong> Three tasks have new prompts and grading criteria. The clearest change in the historical audit was synthesis: 18 recorded passes, but only 12 had enough source support without relying on search snippets.</p>
-      <nav aria-label="On this page"><a href="#changes">What changed</a><a href="#audit">Which results changed</a><a href="#pilot">New model results</a></nav>
+      <p><strong>Historical leaderboard for all 31 tasks.</strong> Scores are carried forward on 28 tasks, with three tasks reviewed against the saved evidence. No historical model was rerun.</p>
+      <nav aria-label="On this page"><a href="#leaderboard">Leaderboard</a><a href="#changes">What changed</a><a href="#audit">Historical audit</a><a href="#pilot">New pilot</a></nav>
     </header>
+    <section id="leaderboard" aria-labelledby="leaderboard-title">
+      <h2 id="leaderboard-title">v0.2 historical leaderboard</h2>
+      <dl>
+        <div><dt>Historical trials</dt><dd>558</dd></div>
+        <div><dt>Credited passes</dt><dd>460</dd></div>
+        <div><dt>Recorded failures</dt><dd>92</dd></div>
+        <div><dt>Unresolved synthesis results</dt><dd>6</dd></div>
+      </dl>
+      <p>Ranges show the pass rate if none to all of a model's unresolved results are ultimately credited. Unresolved results are not failures. This is a historical review, not performance on the current task and runtime revisions.</p>
+      <div class="table">
+        <table aria-label="Historical review scores for all 31 tasks">
+          <thead><tr><th scope="col">Model</th><th scope="col">No skills</th><th scope="col">With skills</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">GPT-5.6 Sol</th><td><strong>80.6%–83.9%</strong><br><small class="muted">25/31 credited · 1 unresolved</small></td><td><strong>96.8%</strong><br><small class="muted">30/31 credited</small></td></tr>
+            <tr><th scope="row">Gemini 3.7 Flash</th><td><strong>80.6%</strong><br><small class="muted">25/31 credited</small></td><td><strong>100.0%</strong><br><small class="muted">31/31 credited</small></td></tr>
+            <tr><th scope="row">Claude Opus 5</th><td><strong>80.6%</strong><br><small class="muted">25/31 credited</small></td><td><strong>100.0%</strong><br><small class="muted">31/31 credited</small></td></tr>
+            <tr><th scope="row">GLM-5.3 Flash</th><td><strong>77.4%</strong><br><small class="muted">24/31 credited</small></td><td><strong>87.1%</strong><br><small class="muted">27/31 credited</small></td></tr>
+            <tr><th scope="row">DeepSeek V4 Flash</th><td><strong>71.0%–74.2%</strong><br><small class="muted">22/31 credited · 1 unresolved</small></td><td><strong>87.1%</strong><br><small class="muted">27/31 credited</small></td></tr>
+            <tr><th scope="row">GPT-5.6 Luna</th><td><strong>71.0%–73.1%</strong><br><small class="muted">66/93 credited · 2 unresolved</small></td><td><strong>94.6%–95.7%</strong><br><small class="muted">88/93 credited · 1 unresolved</small></td></tr>
+            <tr><th scope="row">Qwen3.8-27B</th><td><strong>51.6%</strong><br><small class="muted">16/31 credited</small></td><td><strong>74.2%–77.4%</strong><br><small class="muted">23/31 credited · 1 unresolved</small></td></tr>
+          </tbody>
+          <tfoot><tr><th scope="row">Mean across models</th><td><strong>73.3%–74.5%</strong></td><td><strong>91.4%–92.0%</strong></td></tr></tfoot>
+        </table>
+      </div>
+      <p><strong>On credited passes:</strong> GPT-5.6 Sol, Gemini 3.7 Flash and Claude Opus 5 tie without skills; Gemini and Claude tie with skills. The unresolved results could put Sol ahead without skills, but cannot change the top with-skills result.</p>
+      <p class="muted">All models cover the same 31 tasks. GPT-5.6 Luna has three trials per task and mode; each other model has one. The mean weights each model equally. Some original task revisions are not covered by the release manifest.</p>
+      <p class="muted"><a href="historical-scores.json">Download score counts and provenance (JSON)</a></p>
+    </section>
     <section id="changes" aria-labelledby="changes-title">
       <h2 id="changes-title">What changed in v0.2</h2>
       <dl>
@@ -68,7 +96,7 @@
     </section>
     <section id="audit" aria-labelledby="audit-title">
       <h2 id="audit-title">Which historical results changed?</h2>
-      <p class="muted">These are checks of 54 saved results, not new model runs. The recorded scores are preserved; the audit does not populate the v0.2 ranking.</p>
+      <p class="muted">These are checks of 54 saved results, not new model runs. Original rewards are preserved in the archive. The historical leaderboard above incorporates these audit dispositions.</p>
       <div class="table">
         <table aria-label="Historical review by task">
           <thead><tr><th scope="col">Task</th><th scope="col">Originally recorded</th><th scope="col">What the review found</th></tr></thead>
